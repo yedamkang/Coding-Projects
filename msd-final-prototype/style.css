@@ -443,7 +443,7 @@ button { font: inherit; border: none; background: none; color: inherit; cursor: 
 .activity-nav .tab, .write-btn, .chart .x, .suggest, .next-step .row, .tabbar .tab:nth-child(3) { font-family: var(--font-i); }
 
 /* ---------- [잠금화면 1·2·3] ---------- */
-.screen.lock { background: #1b2a8c url('images/lock-wallpaper.png') center / cover no-repeat, url('lock-wallpaper.png') center / cover no-repeat;   /* images 폴더가 없을 때 대비 */ color: #fff; }
+.screen.lock { url('images/lock-wallpaper.png') center / cover no-repeat, #1b2a8c url('lock-wallpaper.png') center  / cover no-repeat;   /* images 폴더가 없을 때 대비 */ color: #fff; }
 .lock-date, .lock-time { pointer-events: none; }
 .lock-date { position: absolute; left: 0; right: 0; top: 76px; text-align: center; font-size: 22px; font-weight: 500; color: rgba(255,255,255,0.8); }
 .lock-time {
