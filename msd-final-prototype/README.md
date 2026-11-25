@@ -1,23 +1,12 @@
-# 걸어서 캐시 속으로 — 모바일 프로토타입 (v2)
+# 걸어서 캐시 속으로 — 모바일 프로토타입
 
 2026-2 모바일서비스디자인 기말 프로젝트 · Figma → MCP → HTML/CSS/JS
 
 - **화면**: iPhone 16 (393 × 852) 기준 29개 화면 (DE1 11 · DE2 10 · DE3 8)
 - **만든 방법**: Figma MCP(`get_metadata`, `get_screenshot`, `get_design_context`, `get_variable_defs`)로 디자인 정보를 받아서 순수 HTML/CSS/JS로 구현
-- **프레임워크 없음**: React, Tailwind, npm 같은 건 쓰지 않았어요 (수업 11주차 조건)
 
 ---
 
-## 어떻게 여나요?
-
-- **`index.html`을 더블클릭**하면 브라우저(Chrome·Safari·Edge)에서 열려요. `style.css`, `script.js`, `images/`, `fonts/`가 같은 폴더에 있어야 해요 (깃에 올릴 때도 다 같이).
-- 창 크기에 맞춰 폰 화면이 자동으로 줄어들어서, 노트북·태블릿·폰 어디서 열어도 화면 전체가 보여요.
-- 주소 끝에 `#화면id`를 붙이면 그 화면부터 시작해요. 예: `index.html#home`
-- PC에서 열면 왼쪽에 **화면 바로가기 목록**이 생겨요. 발표할 때 원하는 화면으로 바로 이동할 수 있어요.
-- 글꼴까지 폴더 안에 있어서 인터넷이 없어도 똑같이 보여요.
-- 완성된 프로토타입은 브라우저 안에서만 돌아가서, 몇 번을 재생해도 Claude 사용량(토큰)이 들지 않아요.
-
----
 
 ## 화면 연결 지도
 
@@ -85,9 +74,6 @@
 
 **스크롤되는 곳**: 홈(아래 기록 카드), 설정, 동네산책, 성장·기록, 성장·발견, 커뮤니티 게시글(세로) / 보상 카드, 추천 코스, 커뮤니티 칩(가로)
 
----
-
-> 화면 순서와 연결은 팀 Figma 파일(`Team 걸어서 캐시 속으로`)의 **[기말] 제출용 정리** 페이지 번호(DE1/01~DE3/08)와 프로토타입 화살표를 기준으로 맞췄어요.
 
 ## 파일 구성
 
@@ -100,31 +86,6 @@ msd-final-prototype/
 ├─ fonts/                 ← Pretendard·Inter 글꼴 (Figma와 같은 글꼴, 인터넷 없이 동작)
 └─ README.md
 ```
-
-## 글꼴
-
-Figma에서 쓴 글꼴 3종을 그대로 써요. 대부분은 **Noto Sans KR**(Google Fonts), 버튼·가격·목록 제목은 **Pretendard**, 요약 숫자 박스 등은 **Inter**예요 (`fonts/` 폴더).
-Pretendard는 용량을 줄이려고 **이 프로토타입에 쓰인 글자만** 넣었어요. 화면에 새 글자를 넣었는데 그 글자만 모양이 다르면, 전체 Pretendard 파일로 바꾸거나 다시 잘라 넣으면 돼요.
-
-## 자주 하는 수정
-
-| 하고 싶은 것 | 고칠 곳 |
-|---|---|
-| 색 바꾸기 | `style.css` 맨 위 `:root` (예: `--yellow`) |
-| 글자 바꾸기 | `index.html`에서 해당 화면 주석을 찾아 수정 |
-| 버튼이 가는 화면 바꾸기 | 그 버튼의 `data-go="..."` 값 |
-| 시작 화면 | `script.js` 맨 위 `START_SCREEN` |
-| 달력 달성일 | `script.js` → `CALENDAR` |
-| 시간대별 그래프 | `script.js` → `HOURLY_STEPS` |
-| 목표 기간 계산 기준 | `script.js` → `daysFor()` (하루 8,000보·5,000C = 30일) |
-| 화면 바로가기 목록 | `script.js` → `SCREEN_INDEX` |
-
-### VS Code에 Figma MCP 연결하기
-1. VS Code에서 이 폴더를 열고 `Cmd + Shift + P` → **MCP: Add Server**
-2. **HTTP** 선택 → `https://mcp.figma.com/mcp` 입력 → 이름 `figma` → **Workspace**에 저장
-3. Figma 로그인 창에서 **Allow** → Copilot Chat을 **Agent 모드**로 바꾸고 요청
-
----
 
 ## 참고
 - **DE1/02의 세 번째 옵션**: Figma에는 "8,000보"로 적혀 있지만, 24일·하루 약 1시간 20분 기준이라 **10,000보**로 표기했어요.
