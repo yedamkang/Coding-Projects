@@ -1,0 +1,850 @@
+/* =========================================================
+   걸어서 캐시 속으로 — 모바일 프로토타입 스타일
+   ---------------------------------------------------------
+   · 화면 크기: iPhone 16 (393 × 852)
+   · 좌표는 Figma 프레임 기준 px 값을 그대로 사용 (position:absolute)
+   · 색·글꼴은 Figma Variables(디자인 토큰)를 CSS 변수로 옮김
+   ========================================================= */
+
+/* ---------- 0. 글꼴 파일 (fonts/ 폴더, 인터넷 없이도 동작) ----------
+   글꼴은 전부 fonts/ 폴더에 들어 있어서 인터넷이 없어도, 어느 컴퓨터에서 열어도 똑같이 보임
+   Figma에서 쓴 글꼴 3종: Noto Sans KR(대부분 본문) · Pretendard(버튼·가격·목록 제목) · Inter(숫자 요약 박스 등)
+   Pretendard는 이 프로토타입에 쓰인 글자만 잘라 넣어 가볍게 만듦 (글자를 새로 추가하면 README 참고) */
+@font-face { font-family: 'Noto Sans KR'; font-weight: 400; font-display: swap; src: url('fonts/noto-kr-400.woff2') format('woff2'); unicode-range: U+1100-11FF, U+3000-303F, U+3130-318F, U+AC00-D7AF, U+FF00-FFEF; }
+@font-face { font-family: 'Noto Sans KR'; font-weight: 400; font-display: swap; src: url('fonts/noto-latin-400.woff2') format('woff2'); unicode-range: U+0000-024F, U+2000-206F, U+20AC, U+2122, U+2190-21FF, U+2212; }
+@font-face { font-family: 'Noto Sans KR'; font-weight: 500; font-display: swap; src: url('fonts/noto-kr-500.woff2') format('woff2'); unicode-range: U+1100-11FF, U+3000-303F, U+3130-318F, U+AC00-D7AF, U+FF00-FFEF; }
+@font-face { font-family: 'Noto Sans KR'; font-weight: 500; font-display: swap; src: url('fonts/noto-latin-500.woff2') format('woff2'); unicode-range: U+0000-024F, U+2000-206F, U+20AC, U+2122, U+2190-21FF, U+2212; }
+@font-face { font-family: 'Noto Sans KR'; font-weight: 600; font-display: swap; src: url('fonts/noto-kr-600.woff2') format('woff2'); unicode-range: U+1100-11FF, U+3000-303F, U+3130-318F, U+AC00-D7AF, U+FF00-FFEF; }
+@font-face { font-family: 'Noto Sans KR'; font-weight: 600; font-display: swap; src: url('fonts/noto-latin-600.woff2') format('woff2'); unicode-range: U+0000-024F, U+2000-206F, U+20AC, U+2122, U+2190-21FF, U+2212; }
+@font-face { font-family: 'Noto Sans KR'; font-weight: 700; font-display: swap; src: url('fonts/noto-kr-700.woff2') format('woff2'); unicode-range: U+1100-11FF, U+3000-303F, U+3130-318F, U+AC00-D7AF, U+FF00-FFEF; }
+@font-face { font-family: 'Noto Sans KR'; font-weight: 700; font-display: swap; src: url('fonts/noto-latin-700.woff2') format('woff2'); unicode-range: U+0000-024F, U+2000-206F, U+20AC, U+2122, U+2190-21FF, U+2212; }
+@font-face { font-family: 'Noto Sans KR'; font-weight: 800; font-display: swap; src: url('fonts/noto-kr-800.woff2') format('woff2'); unicode-range: U+1100-11FF, U+3000-303F, U+3130-318F, U+AC00-D7AF, U+FF00-FFEF; }
+@font-face { font-family: 'Noto Sans KR'; font-weight: 800; font-display: swap; src: url('fonts/noto-latin-800.woff2') format('woff2'); unicode-range: U+0000-024F, U+2000-206F, U+20AC, U+2122, U+2190-21FF, U+2212; }
+@font-face { font-family: 'Lemon'; font-weight: 400; font-display: swap; src: url('fonts/lemon-400.woff2') format('woff2'); }
+@font-face { font-family: 'Pretendard'; font-weight: 400; font-display: swap; src: url('fonts/pretendard-400.woff2') format('woff2'); }
+@font-face { font-family: 'Pretendard'; font-weight: 500; font-display: swap; src: url('fonts/pretendard-500.woff2') format('woff2'); }
+@font-face { font-family: 'Pretendard'; font-weight: 600; font-display: swap; src: url('fonts/pretendard-600.woff2') format('woff2'); }
+@font-face { font-family: 'Pretendard'; font-weight: 700; font-display: swap; src: url('fonts/pretendard-700.woff2') format('woff2'); }
+@font-face { font-family: 'Pretendard'; font-weight: 800; font-display: swap; src: url('fonts/pretendard-800.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-weight: 400; font-display: swap; src: url('fonts/inter-400.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-weight: 500; font-display: swap; src: url('fonts/inter-500.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-weight: 600; font-display: swap; src: url('fonts/inter-600.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-weight: 700; font-display: swap; src: url('fonts/inter-700.woff2') format('woff2'); }
+
+/* ---------- 1. 디자인 토큰 (Figma Variables) ---------- */
+:root {
+  /* 색상 */
+  --yellow: #F8D547;        /* Design System/노랑 — 메인 버튼, 진행 바 */
+  --yellow-deep: #FFBC04;   /* Design System/진노랑 — 강조 텍스트, 활성 탭 */
+  --yellow-light: #FFF6D7;  /* Design System/연노랑 — 선택 카드, 안내 박스 */
+  --black: #111111;         /* Design System/Text/검정 */
+  --brown: #473A3A;         /* Design System/Text/갈색 */
+  --gray-text: #909090;     /* Design System/Text/회색 */
+  --gray-btn: #929292;      /* Button/회색 */
+  --gray-line: #D9D9D9;     /* Design System/옅은 회색 — 구분선, 바 트랙 */
+  --gray-bg: #F6F6F6;       /* Design System/비활성화 — 비선택 칩·카드 */
+  --text-sub: #4A4A4A;      /* 보조 텍스트 */
+  --text-2: #303030;        /* 본문 진한 회색 */
+  --text-3: #5A5A5A;        /* 본문 중간 회색 */
+  --orange: #FC922A;        /* Design System/주황 — 오늘, 강조 아이콘 */
+  --white: #FFFFFF;
+
+  /* 효과 */
+  --shadow-card: 0 0 5px rgba(0, 0, 0, 0.15);   /* Card/Shade */
+
+  /* 글꼴 */
+  --font: 'Noto Sans KR', 'Pretendard', -apple-system, 'Apple SD Gothic Neo', sans-serif;
+  --font-p: 'Pretendard', 'Noto Sans KR', -apple-system, sans-serif;   /* Figma에서 Pretendard인 글자 */
+  --font-i: 'Inter', 'Pretendard', 'Noto Sans KR', sans-serif;          /* Figma에서 Inter인 글자 */
+  --font-coin: 'Lemon', serif;   /* 캐시 아이콘 안의 "C" */
+
+  /* 화면 크기 */
+  --screen-w: 393px;
+  --screen-h: 852px;
+}
+
+/* ---------- 2. 페이지 기본 ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%; overflow: hidden;   /* 바깥 페이지는 고정, 스크롤은 폰 화면 안에서만 */
+  background: #E9E9EC;           /* 폰 바깥 배경 */
+  font-family: var(--font);
+  line-height: 1.2;   /* Figma 글자 상자 높이(자동) = 글자 크기 × 약 1.2 — 브라우저 기본(Noto 1.45)이면 글씨가 아래로 밀림 */
+  color: var(--black);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button { font: inherit; border: none; background: none; color: inherit; cursor: pointer; }
+
+/* ---------- 3. 폰 프레임 ----------
+   PC에서는 393×852 폰 모양으로 가운데에 보이고,
+   실제 폰(화면 폭 500px 이하)에서는 전체 화면을 꽉 채움 */
+.phone {
+  position: relative;
+  width: var(--screen-w);
+  height: var(--screen-h);
+  overflow: hidden;
+  background: var(--white);
+  border-radius: 48px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18), 0 0 0 10px #1c1c1e;
+  transform-origin: top left;   /* script.js > fit() 가 창 크기에 맞춰 축소 */
+  flex: none;
+}
+
+@media (max-width: 500px) {
+  body { background: var(--white); align-items: flex-start; }
+  .phone { border-radius: 0; box-shadow: none; }
+}
+
+/* ---------- 4. 화면(Screen) ----------
+   각 Figma 프레임 = <section class="screen">
+   .active가 붙은 화면 하나만 보임 */
+.screen {
+  position: absolute;
+  inset: 0;
+  background: var(--white);
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+.screen.active { opacity: 1; pointer-events: auto; z-index: 1; }
+
+/* 위치 지정 도우미: Figma의 x, y를 left, top으로 그대로 씀 */
+.abs { position: absolute; }
+
+/* 탭할 수 있는 요소 */
+[data-go], [data-back], [data-action] { cursor: pointer; }
+[data-go]:active, [data-back]:active, [data-action]:active { filter: brightness(0.94); }
+
+/* 일러스트·사진 (Figma에서 내보낸 PNG를 잘라 사용) */
+.img { position: absolute; display: block; object-fit: contain; pointer-events: none; }
+
+/* ---------- 5. 공통 컴포넌트 ---------- */
+
+/* 5-1. 상태바 (Status bar - iPhone) */
+.status-bar {
+  position: absolute; left: 0; top: 0;
+  width: 393px; height: 62px; z-index: 50;
+  pointer-events: none;
+}
+.status-bar .time {
+  position: absolute; left: 49px; top: 21px;
+  font-size: 17px; font-weight: 600; letter-spacing: -0.2px;
+}
+.status-bar .island {   /* 다이내믹 아일랜드 */
+  position: absolute; left: 134px; top: 14px;
+  width: 125px; height: 37px; border-radius: 20px; background: #000;
+}
+.status-bar .icons {
+  position: absolute; right: 34px; top: 23px;
+  display: flex; gap: 6px; align-items: center;
+}
+.status-bar.light { color: #fff; }   /* 잠금화면처럼 어두운 배경일 때 */
+
+/* 5-2. 홈 인디케이터 (하단 막대) */
+.home-indicator {
+  position: absolute; left: 50%; bottom: 8px; z-index: 50;
+  width: 144px; height: 5px; margin-left: -72px;
+  border-radius: 100px; background: #000;
+  pointer-events: none;
+}
+.home-indicator.light { background: #fff; }
+
+/* 5-3. 상단 바 (Top) — 뒤로가기 + 제목 */
+.top {
+  position: absolute; left: 0; top: 62px;
+  width: 393px; height: 60px;
+}
+.top .back {
+  position: absolute; left: 20px; top: 12px;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+}
+.top .title {
+  position: absolute; left: 0; right: 0; top: 14px;
+  text-align: center; font-size: 24px; font-weight: 600; color: var(--black);
+  pointer-events: none;   /* 제목이 뒤로가기 버튼을 가리지 않게 */
+}
+
+/* 5-4. 메인 버튼 (버튼 컴포넌트) — 노란 알약 모양 */
+.btn {
+  position: absolute; left: 20px;
+  width: 353px; height: 42px; border-radius: 24px;
+  background: var(--yellow);
+  font-size: 16px; font-weight: 600; color: #000;
+  display: flex; align-items: center; justify-content: center;
+}
+.btn.gray { background: var(--gray-bg); color: var(--gray-text); }
+.btn.tall { height: 54px; border-radius: 27px; font-size: 16px; }
+/* 이전으로 + 다음 두 버튼 한 줄 (Button/Main 쌍) */
+.btn-row { position: absolute; left: 20px; width: 353px; height: 54px; display: flex; gap: 6px; }
+.btn-row button { flex: 1; border-radius: 27px; font-size: 16px; font-weight: 600; }
+.btn-row .prev { background: #fff; border: 1px solid var(--yellow); color: #111; }
+.btn-row .next { background: var(--yellow); color: #111; }
+.btn.line { background: #fff; border: 1.5px solid var(--yellow); }
+
+/* "나중에 설정하기" 같은 텍스트 버튼 */
+.text-btn {
+  position: absolute; left: 0; right: 0;
+  text-align: center; font-size: 14px; font-weight: 500;
+  color: var(--gray-text); text-decoration: underline; text-underline-offset: 3px;
+}
+
+/* 5-5. 캐시 코인 아이콘 (노란 원 + C) */
+.coin {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: #111; color: #fff;
+  font-family: var(--font-coin); font-size: 15px; line-height: 1;
+  flex: none;
+}
+.coin.sm { width: 14px; height: 14px; font-size: 10px; }
+.coin.yellow { background: var(--yellow-deep); }
+
+/* 5-6. 흰 카드 (Box/white) */
+.card {
+  position: absolute; background: #fff;
+  border-radius: 10px; box-shadow: var(--shadow-card);
+}
+
+/* 5-7. 걸음 수 진행 바 (Bar/걸음수) */
+.bar {
+  position: absolute; height: 8px; border-radius: 4px;
+  background: var(--gray-line); overflow: hidden;
+}
+.bar > i {
+  display: block; height: 100%; border-radius: 4px;
+  background: var(--yellow);
+  transition: width 0.8s ease;
+}
+
+/* 5-8. 하단 기본 내비게이터 (Navigator/Tabbar/Main — 혜택·쇼핑·홈·성장·활동) */
+.tabbar {
+  position: absolute; left: 0; top: 757px; z-index: 40;
+  width: 393px; height: 95px; padding: 0 12px 34px;
+  background: #fff; border-top: 1px solid #EDEDED;
+  display: flex; align-items: center;
+}
+.tabbar .tab {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 500; color: #4A4A4A;
+}
+.tabbar .tab svg { width: 24px; height: 24px; }
+.tabbar .tab.on { color: var(--yellow-deep); }
+
+/* 5-9. 활동 내비게이터 (← · 동네산책 · 챌린지 · 커뮤니티 플로팅 바) */
+.activity-nav {
+  position: absolute; left: 20px; top: 737px; z-index: 40;
+  width: 353px; height: 65px; padding: 0 10px; border-radius: 40px;
+  background: #fff; filter: drop-shadow(0 0 2.5px rgba(0,0,0,0.15));
+  display: flex; align-items: center; gap: 28px;
+}
+.activity-nav .home-btn {   /* 왼쪽 회색 동그라미 ← : 홈으로 */
+  width: 48px; height: 48px; border-radius: 50%; background: #EFEFEF; color: #555;
+  display: flex; align-items: center; justify-content: center; flex: none;
+}
+.activity-nav .tab {
+  width: 56px; height: 65px; flex: none;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  font-size: 13px; font-weight: 500; color: var(--gray-text); white-space: nowrap;
+}
+.activity-nav .tab svg { width: 24px; height: 24px; }
+.activity-nav .tab.on { color: var(--yellow-deep); }
+
+/* 5-10. 카테고리 칩 */
+.chip {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 4px 10px; border-radius: 20px;
+  background: var(--gray-bg); color: var(--gray-text);
+  font-size: 16px; font-weight: 500; letter-spacing: 0.48px;
+}
+.chip.on { background: var(--yellow); color: #000; }
+
+/* 5-11. 바텀시트 손잡이 */
+.handle {
+  position: absolute; left: 50%; margin-left: -19px;
+  width: 38px; height: 4px; border-radius: 2px; background: var(--gray-line);
+}
+
+/* 5-12. 토스트 (프로토타입 범위 밖 버튼을 눌렀을 때 안내) */
+.toast {
+  position: absolute; left: 50%; bottom: 110px; z-index: 100;
+  transform: translate(-50%, 20px); opacity: 0;
+  padding: 10px 16px; border-radius: 20px;
+  background: rgba(17,17,17,0.85); color: #fff; font-size: 13px; white-space: nowrap;
+  transition: all 0.25s ease; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* 5-13. 발표용 화면 목록 (폭 900px 이상일 때만) */
+.screen-index { display: none; }
+@media (min-width: 900px) {
+  body { gap: 48px; }
+  .screen-index {
+    display: block; width: 220px; max-height: calc(100vh - 40px); overflow-y: auto;
+    padding: 20px 16px; border-radius: 20px; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  }
+  .si-title { font-size: 16px; font-weight: 700; }
+  .si-sub { font-size: 12px; color: var(--gray-text); margin: 4px 0 12px; }
+  .si-group { font-size: 11px; font-weight: 700; color: var(--yellow-deep); margin: 12px 0 4px; }
+  .si-list button {
+    display: block; width: 100%; padding: 6px 8px; border-radius: 8px; text-align: left;
+    font-size: 13px; color: #333;
+  }
+  .si-list button:hover { background: var(--gray-bg); }
+  .si-list button.on { background: var(--yellow-light); font-weight: 600; }
+}
+
+/* 공통 텍스트 스타일 (Figma 텍스트 스타일 이름 그대로) */
+.t-22 { font-size: 22px; font-weight: 600; line-height: 1.2; }        /* 22,Semibold */
+.t-24 { font-size: 24px; font-weight: 600; }                          /* 24,Semi */
+.t-16 { font-size: 16px; font-weight: 700; letter-spacing: 0.48px; }  /* 16,Semibold,3% */
+.t-16m { font-size: 16px; font-weight: 500; }                         /* 16,Medium */
+.t-14 { font-size: 14px; font-weight: 500; letter-spacing: 0.42px; }
+.t-12 { font-size: 12px; font-weight: 500; letter-spacing: 0.36px; }  /* 12,Medium,3% */
+.t-12s { font-size: 12px; font-weight: 600; letter-spacing: 0.36px; } /* 12,SemiBold,3% */
+.t-10 { font-size: 10px; font-weight: 500; letter-spacing: 0.3px; }   /* 10,Medium,3% */
+.c-gray { color: var(--gray-text); }
+.c-sub { color: var(--text-sub); }
+.c-dim { color: rgba(0,0,0,0.7); }
+.c-deep { color: var(--yellow-deep); }
+.nowrap { white-space: nowrap; }
+.center { text-align: center; }
+
+/* =========================================================
+   6. 화면별 스타일 — 아래로 화면 순서대로 이어짐
+   ========================================================= */
+
+/* =========================================================
+   6. v2 공통 패턴 (여러 화면에서 반복되는 Figma 컴포넌트)
+   ========================================================= */
+
+/* 스크롤 영역: 화면보다 긴 내용은 이 안에서 위아래로 움직임 */
+.scroll-y {
+  position: absolute; left: 0; right: 0; top: 0; bottom: 0;
+  overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll-x { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; scroll-snap-type: x proximity; scroll-padding-inline: 20px; }   /* 자석 정렬 기준을 왼쪽 여백 20px에 맞춤 (안 그러면 첫 카드가 화면 끝에 붙음) */
+.scroll-y::-webkit-scrollbar, .scroll-x::-webkit-scrollbar { display: none; }
+.scroll-y > .content { position: relative; width: 393px; }   /* 높이는 화면마다 style로 지정 */
+
+/* 스크롤 화면은 상태바 뒤로 내용이 지나가므로 흰 배경 */
+.screen.has-scroll .status-bar { background: #fff; }
+
+/* 상단 바 (Top/Back): 뒤로가기 + 가운데 제목 */
+.top .title { font-weight: 700; }
+
+/* 안내 문구 (GuideComment) */
+.guide { position: absolute; font-size: 22px; font-weight: 700; line-height: 1.3; color: #111; letter-spacing: -0.2px; }
+
+/* 닫기 X (icon/close) */
+.close-btn { position: absolute; left: 342px; top: 62px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; color: #111; z-index: 5; }
+
+/* 예상 안내 카드 (Card/Prediction) — 회색 박스 + 주황 달력 아이콘 */
+.predict {
+  position: absolute; left: 20px; width: 353px; height: 53px; padding: 0 16px;
+  display: flex; align-items: center; gap: 10px;
+  border-radius: 12px; background: var(--gray-bg);
+  font-size: 14px; font-weight: 500; color: var(--text-2);
+}
+.predict svg { width: 20px; height: 20px; color: var(--orange); flex: none; }
+
+/* 라디오 선택 카드 (Goal/Option) */
+.option {
+  position: absolute; left: 20px; width: 353px; height: 80px; padding: 0 18px 0 16px;
+  display: flex; align-items: center; gap: 22px; text-align: left;
+  border: 1px solid #DCDCDC; border-radius: 12px; background: #fff;
+}
+.option.on { background: var(--yellow-light); border-color: var(--yellow); }
+.option .radio { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid #AFAFAF; flex: none; position: relative; background: #fff; }
+.option.on .radio { border: 6px solid var(--yellow); }
+.option .txt { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.option .txt b { font-size: 20px; font-weight: 700; color: #303030; display: flex; align-items: center; gap: 8px; }
+.option .txt small { font-size: 15px; font-weight: 500; color: var(--text-3); }
+.option .val { font-size: 17px; font-weight: 700; color: #303030; }
+.badge-rec { font-size: 12px; font-weight: 700; color: #473A3A; background: var(--yellow); padding: 3px 9px; border-radius: 10px; }
+
+/* 축하 화면 배지 (icon/award + 글자) */
+.award {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px 6px 10px; border-radius: 15px;
+  background: #FFF0E3; color: var(--orange); font-size: 14px; font-weight: 500; white-space: nowrap;
+}
+.award svg { width: 17px; height: 17px; }
+.cheer { position: absolute; left: 0; right: 0; text-align: center; }
+.cheer b { display: block; font-size: 26px; font-weight: 700; line-height: 1.3; color: #303030; }
+.cheer small { display: block; font-size: 14px; font-weight: 500; color: var(--text-3); margin-top: 12px; }
+
+/* 3칸 요약 박스 (TotalInformation / WalkSummary) */
+.total-box {
+  position: absolute; left: 20px; width: 353px; height: 92px; padding: 0 14px;
+  display: flex; align-items: center;
+  background: #fff; border: 0.5px solid rgba(0,0,0,0.2); border-radius: 14px;
+  filter: drop-shadow(0 4px 6.5px rgba(0,0,0,0.09));
+}
+.total-box div { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+.total-box div:last-child { flex: 0 0 82px; }
+.total-box small { font-size: 12px; font-weight: 500; color: rgba(0,0,0,0.7); }
+.total-box b { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 700; white-space: nowrap; }
+
+/* 연속 기록 요일 아이콘 (Streak/Weekday) */
+.streak-row { display: flex; justify-content: space-between; }
+.streak-row span { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 26px; font-size: 12px; font-weight: 700; color: rgba(0,0,0,0.7); }
+.st { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
+.st.check { background: var(--yellow); }
+.st.check::after { content: ''; width: 11px; height: 6px; border-left: 2px solid #333; border-bottom: 2px solid #333; transform: rotate(-45deg) translate(1px,-1px); }
+.st.repair { background: #FFE3C7; border: 1.5px dashed var(--orange); }             /* 복구할 수 있는 빈 날 */
+.st.repair::after { content: ''; width: 18px; height: 18px; background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M19.5 12a7.5 7.5 0 1 1-2.2-5.3' fill='none' stroke='%23FC922A' stroke-width='1.6' stroke-linecap='round'/><path d='M18.6 3.2v4.3h-4.3' fill='none' stroke='%23FC922A' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>") center / contain no-repeat; }   /* 복구 아이콘: Figma처럼 얇고 크게 */
+.st.today { border: 1.5px solid #111; }                                               /* 오늘 */
+.st.today::before { content: ''; position: absolute; bottom: -9px; width: 4px; height: 4px; border-radius: 50%; background: #111; }
+.st.future { border: 1.5px dashed #6A6A6A; }                                          /* 아직 안 온 날 */
+
+/* 보상 카드 (Card/Rewards) */
+.reward-card {
+  width: 150px; height: 150px; padding: 10px 10px 0; flex: none;
+  display: flex; flex-direction: column; align-items: center;
+  border-radius: 14px; background: var(--gray-bg); border: 2px solid transparent;
+  filter: drop-shadow(0 0 2.5px rgba(0,0,0,0.15)); scroll-snap-align: start;
+}
+.reward-card.on { background: var(--yellow-light); border-color: var(--yellow); }
+.reward-card img { width: 70px; height: 70px; border-radius: 10px; background: #fff; object-fit: cover; margin-bottom: 5px; }
+.reward-card small { font-size: 10px; font-weight: 500; color: #4A4A4A; letter-spacing: 0.3px; }
+.reward-card b { font-size: 16px; font-weight: 500; color: var(--black); letter-spacing: 0.48px; white-space: nowrap; }
+.reward-card span { display: flex; align-items: center; gap: 2px; font-size: 14px; font-weight: 600; margin-top: 4px; }
+
+/* 칩 (Category/Chip) — v2: 노랑/회색 둥근 */
+.chips { position: absolute; display: flex; gap: 6px; white-space: nowrap; }
+.chip { padding: 5px 13px; font-size: 15px; font-weight: 500; }
+
+/* =========================================================
+   Figma 글꼴 맞추기 (2차 검수)
+   Figma에서 Pretendard / Inter로 된 글자만 바꿈. 나머지는 Noto Sans KR.
+   글꼴마다 줄 높이가 달라서, 잘못된 글꼴이면 글씨가 아래로 밀려 보임
+   ========================================================= */
+.f-p { font-family: var(--font-p); }
+.f-i { font-family: var(--font-i); }
+/* Pretendard: 버튼, 보상 가격, 탭바, 달력, 목록 제목, 지도 핀 숫자 */
+.btn, .btn-row button, .pill, .tabbar .tab,
+.reward-card span, .set-head, .place b, .post b,
+.segment button, .cal-card .month-row p, .cal2, .cal-head,
+.filter, .cash-mini { font-family: var(--font-p); }
+/* Inter: 요약 숫자 박스, 필요 캐시 안내, 하단 활동 내비, 글쓰기, 그래프 축, 제안 카드 */
+.need-row, .total-box, .walk-stats b, .confirm-reward,
+.activity-nav .tab, .write-btn, .chart .x, .suggest, .next-step .row, .tabbar .tab:nth-child(3) { font-family: var(--font-i); }
+
+/* ---------- [잠금화면 1·2·3] ---------- */
+.screen.lock { background: #1b2a8c url('images/lock-wallpaper.png') center / cover no-repeat; color: #fff; }
+.lock-date, .lock-time { pointer-events: none; }
+.lock-date { position: absolute; left: 0; right: 0; top: 76px; text-align: center; font-size: 22px; font-weight: 500; color: rgba(255,255,255,0.8); }
+.lock-time {
+  position: absolute; left: 0; right: 0; top: 104px; text-align: center;
+  font-family: -apple-system, 'SF Pro Rounded', 'Pretendard', sans-serif;
+  font-size: 96px; font-weight: 600; letter-spacing: -2px; color: rgba(255,255,255,0.92);
+}
+
+/* 알림 카드 (반투명 유리) */
+.noti {
+  position: absolute; left: 16px; width: 362px; border-radius: 22px;
+  background: rgba(0,0,0,0.2); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #fff; text-align: left;
+  animation: noti-in 0.4s ease;
+}
+@keyframes noti-in { from { opacity: 0; transform: translateY(-12px) scale(0.97); } to { opacity: 1; transform: none; } }
+.noti .logo { position: absolute; left: 14px; width: 36px; height: 36px; border-radius: 10px; }
+/* Figma 알림 글자는 Inter(줄높이 auto ≈ 1.21) — Noto로 두면 줄이 커져서 아래로 밀림 */
+.noti .app, .noti .when, .noti .ttl, .noti .body, .noti .act { font-family: var(--font-i); line-height: 1.21; }
+.noti .app { position: absolute; left: 61px; top: 14px; font-size: 13px; font-weight: 600; }
+.noti .when { position: absolute; left: 322px; top: 14px; font-size: 11px; color: #eee; }
+.noti .ttl { position: absolute; left: 61px; top: 34px; font-size: 13px; font-weight: 600; }
+.noti .body { position: absolute; left: 61px; top: 54px; font-size: 12px; color: #f1f1f1; }
+.noti .track { position: absolute; left: 61px; width: 270px; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.32); }
+.noti .track i { display: block; height: 100%; border-radius: 3px; background: #FFDC39; }
+.noti .act {
+  position: absolute; top: 89px; width: 133px; height: 36px; border-radius: 13px;
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  font-size: 12px; font-weight: 600; color: #111; background: rgba(255,255,255,0.26);
+}
+.noti .act:first-of-type { left: 61px; }
+.noti .act:last-of-type { left: 198px; }
+.noti .act.yellow { background: #FFDB37; color: #242424; }
+
+/* 하단 손전등·카메라 */
+.lock-icons { position: absolute; left: 40px; right: 40px; top: 765px; display: flex; justify-content: space-between; }
+.lock-icons span {
+  width: 50px; height: 50px; border-radius: 50%; background: rgba(0,0,0,0.25);
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ---------- [DE1/01~03 목표설정] ---------- */
+.reward-grid { display: grid; grid-template-columns: repeat(4, 150px); grid-template-rows: 150px 150px; column-gap: 15px; row-gap: 14px; width: max-content; padding-right: 20px; }
+#goal-1 .scroll-x { height: 330px !important; }
+
+.need-box {
+  width: 353px; height: 76px; padding: 15px 16px;
+  border-radius: 14px; background: var(--yellow-light);
+}
+.need-row { display: flex; align-items: center; gap: 4px; margin-top: 4px; }
+.need-row b { font-size: 24px; font-weight: 500; }
+.need-row span { font-size: 14px; margin-left: 4px; }
+
+/* 직접설정 − 9,000 + */
+.option.custom { cursor: pointer; }
+.stepper-mini { display: flex; align-items: center; gap: 18px; }
+.stepper-mini button { width: 24px; height: 24px; border: 1px solid #777; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+.stepper-mini b { font-size: 17px; font-weight: 700; color: #303030; min-width: 52px; text-align: center; }
+
+/* 확인 화면 */
+.confirm-reward {
+  left: 111px; top: 213px; width: 170px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center;
+}
+.confirm-reward img { width: 170px; height: 170px; object-fit: contain; border-radius: 10px; }
+.confirm-reward .price { display: flex; align-items: center; gap: 2px; font-size: 24px; font-weight: 500; margin-top: 2px; }
+.confirm-info {
+  left: 20px; top: 485px; width: 353px; height: 117px; padding: 20px 16px;
+  display: flex; flex-direction: column; gap: 10px;
+  border-radius: 14px; background: #fff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+.confirm-info p { display: flex; justify-content: space-between; align-items: center; font-size: 15px; color: #444; }
+.confirm-info b { font-size: 16px; font-weight: 500; color: #111; }
+
+/* ---------- [DE1/04~07 홈] ---------- */
+.reward-status { text-align: center; }
+.cash-row { display: flex; align-items: center; justify-content: center; gap: 5px; margin-top: 3px; }
+.cash-row b { font-size: 24px; font-weight: 700; }
+.cash-row span { font-size: 16px; font-weight: 500; color: rgba(0,0,0,0.7); margin-top: 6px; }
+
+.record-card { border-radius: 10px; }
+.rc-head { text-align: left; display: flex; flex-direction: column; gap: 8px; }
+.rc-head b { font-size: 18px; font-weight: 700; color: var(--text-2); letter-spacing: 0.54px; }
+.rc-head small { font-size: 12px; font-weight: 500; color: var(--text-3); width: 238px; line-height: 1.3; }
+.rc-btn {
+  left: 21px; top: 161px; width: 310px; height: 45px; border-radius: 20px;
+  background: var(--yellow); font-size: 14px; font-weight: 500; color: var(--text-2);
+}
+
+/* 산책 제안 팝업 */
+.dim { position: absolute; inset: 0; z-index: 55; background: rgba(0,0,0,0.25); }
+.sheet {
+  position: absolute; left: 0; top: 497px; z-index: 56;
+  width: 393px; height: 355px; border-radius: 16px 16px 0 0; background: #fff;
+}
+.screen.active .sheet { animation: sheet-up 0.3s ease; }
+@keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+[data-cloned] { pointer-events: none; }
+
+/* ---------- [DE1/08~11 달성·교환·다음 목표] ---------- */
+.screen.active .pop-in { animation: pop-in 0.5s cubic-bezier(.34,1.56,.64,1); }
+@keyframes pop-in { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.final-msg em { display: block; font-style: normal; font-size: 12px; font-weight: 700; color: #4A4A4A; margin-bottom: 8px; }
+.final-msg b { font-size: 24px; }
+.final-msg small { font-size: 16px; font-weight: 500; color: #303030; margin-top: 10px; }
+
+.text-btn.plain { text-decoration: none; color: #4A4A4A; font-size: 14px; }
+
+.barcode-card {
+  width: 353px; height: 99px; border-radius: 14px; background: #fff;
+  border: 0.5px solid rgba(0,0,0,0.2); filter: drop-shadow(0 4px 6.5px rgba(0,0,0,0.09));
+  display: flex; flex-direction: column; align-items: center; padding-top: 16px; gap: 8px;
+}
+.barcode {
+  width: 198px; height: 44px;
+  background: repeating-linear-gradient(90deg, #111 0 2px, transparent 2px 5px, #111 5px 6px, transparent 6px 9px, #111 9px 12px, transparent 12px 15px, #111 15px 16px, transparent 16px 19px, #111 19px 23px, transparent 23px 26px);
+}
+.barcode-card p { font-size: 12px; letter-spacing: 2px; color: #333; }
+
+.next-grid { display: grid; grid-template-columns: repeat(2, 150px); gap: 10px; }
+
+/* ---------- [성장/그래프] ---------- */
+.segment {
+  display: flex; gap: 1px; padding: 0;
+  background: var(--gray-bg); border: 1px solid var(--gray-line); border-radius: 20px;
+}
+.segment button {
+  padding: 10px 22px; border-radius: 20px;
+  font-size: 16px; font-weight: 500; letter-spacing: 0.48px; color: var(--gray-text);
+  transition: background 0.2s;
+}
+.segment button.on {
+  background: var(--yellow); color: var(--black); font-size: 18px; font-weight: 600; letter-spacing: 0;
+  filter: drop-shadow(0 0 2.5px rgba(0,0,0,0.15));
+}
+.graph-card {
+  left: 24px; top: 200px; width: 345px; height: 384px;
+  border-radius: 10px; background: #FFFAEB; box-shadow: var(--shadow-card);
+}
+.chart { width: 345px; height: 220px; }
+.chart .guide { position: absolute; left: 18px; width: 289px; height: 1px; background: var(--gray-line); }
+.chart .y { position: absolute; left: 310px; font-size: 10px; color: var(--gray-line); }
+.chart .x { position: absolute; top: 193px; font-size: 10px; color: var(--brown); }
+/* 막대: 아래(181px)에서 위로 자라남 */
+.chart .b {
+  position: absolute; bottom: 39px; width: 7.5px; border-radius: 3px;
+  background: var(--yellow); transform-origin: bottom;
+}
+.chart .b.zero { background: var(--gray-line); }
+.chart .b.max { background: var(--yellow-deep); }
+.screen.active .chart .b { animation: grow-up 0.6s ease both; }
+@keyframes grow-up { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
+/* ---------- [DE2/04 설정] ---------- */
+.profile { width: 393px; height: 81px; padding: 0 24px 0 33px; display: flex; align-items: center; gap: 18px; text-align: left; }
+.profile .avatar { width: 57px; height: 57px; border-radius: 50%; background: #E3E3E3; color: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.profile span { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.profile b { font-size: 20px; font-weight: 700; }
+.profile small { font-size: 14px; color: #555; }
+.set-group {
+  position: absolute; left: 20px; width: 352px; padding: 24px;
+  display: flex; flex-direction: column; gap: 28px;
+  background: var(--gray-bg); border-radius: 10px;
+}
+.set-head { font-size: 17px; font-weight: 600; color: #4A4A4A; }
+.set-item { display: flex; align-items: center; justify-content: space-between; font-size: 16px; font-weight: 500; color: #111; text-align: left; }
+.set-item svg { width: 22px; height: 22px; color: #888; }
+
+/* ---------- [DE2/05 틈새워크 설정] ---------- */
+.type-grid { display: grid; grid-template-columns: repeat(2, 170.5px); gap: 12px; }
+.type-card {
+  height: 71px; padding: 0 14px; display: flex; align-items: center; gap: 10px; text-align: left;
+  border: 1px solid #DCDCDC; border-radius: 10px; background: #fff; box-shadow: var(--shadow-card);
+}
+.type-card.on { border-color: var(--yellow); }
+.type-card svg { width: 24px; height: 24px; color: var(--yellow-deep); flex: none; }
+.type-card:not(.on) svg { opacity: 0.45; filter: grayscale(0.6); }
+.type-card span { display: flex; flex-direction: column; gap: 3px; }
+.type-card small { font-size: 10px; color: #4A4A4A; }
+.type-card b { font-size: 16px; font-weight: 500; color: #111; }
+.type-card:not(.on) b { color: #9A9A9A; }.type-card:not(.on) svg.keep-color { opacity: 1; filter: none; }   /* 나무 아이콘은 Figma에서 항상 초록 */
+
+/* ---------- [DE2/06 동네산책] ---------- */
+.suggest {
+  width: 353px; height: 60px; padding: 11px 14px; border-radius: 13px; background: #FFF9DE;
+  display: flex; flex-direction: column; justify-content: center; gap: 3px; text-align: left;
+}
+.suggest b { font-size: 15px; font-weight: 700; color: var(--black); }
+.suggest small { font-size: 11px; color: #5E5050; }
+.cash-mini { display: flex; align-items: center; gap: 6px; font-size: 16px; font-weight: 500; }
+.cash-mini b { font-size: 18px; font-weight: 700; margin-right: -4px; }
+
+.card.place {
+  width: 353px; height: 89px; padding: 12px 14px;
+  display: flex; align-items: center; gap: 8px; text-align: left;
+  box-shadow: none; filter: drop-shadow(0 0 2.5px rgba(0,0,0,0.15));
+}
+.card.place img { width: 66px; height: 66px; border-radius: 10px; object-fit: cover; }
+.card.place span { flex: 1; display: flex; flex-direction: column; gap: 6px; padding-left: 6px; }
+.card.place b { font-size: 16px; font-weight: 700; letter-spacing: 0.48px; color: var(--black); }
+.card.place small { font-size: 12px; font-weight: 500; letter-spacing: 0.36px; color: #4A4A4A; }
+.go {
+  width: 27px; height: 27px; border-radius: 50%; flex: none;
+  border: 2px solid var(--yellow-deep); color: var(--yellow-deep);
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ---------- [DE2/07~08 산책 지도] ---------- */
+.filters { display: flex; gap: 10px; z-index: 25; }
+/* Figma Button/WalkType 83×35 · Button/Time 65×35 (Pretendard SemiBold 12) */
+.filter {
+  height: 35px; padding: 0 0 0 11px; border-radius: 20px; background: var(--yellow);
+  display: flex; align-items: center; gap: 4px; font-family: var(--font-p); font-size: 12px; font-weight: 600; color: var(--brown);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+.filter:first-child { width: 83px; }
+.filter:last-child { width: 65px; }
+.filter svg { width: 18px; height: 18px; flex: none; }
+/* 펼쳤을 때도 크기·위치는 기본 상태 그대로 (화살표만 위로) */
+.filter.open svg { transform: rotate(180deg); }
+
+.walk-sheet {
+  position: absolute; left: 0; top: 517px; z-index: 20;
+  width: 393px; height: 335px; border-radius: 22px 22px 0 0; background: #fff;
+}
+.course-row { display: flex; gap: 4px; }   /* Figma: 카드 테두리(바깥 2px)끼리 4px 간격 */
+.course {
+  width: 154px; height: 154px; padding: 7px 10px 10px; flex: none;   /* Figma 카드 150 + 바깥 테두리 2px×2 */
+  display: flex; flex-direction: column; align-items: flex-start; text-align: left;
+  border-radius: 14px; background: var(--gray-bg); border: 2px solid transparent;
+  filter: drop-shadow(0 0 2.5px rgba(0,0,0,0.15)); scroll-snap-align: start;
+}
+.course.on { background: var(--yellow-light); border-color: var(--yellow); }
+.course img { width: 100%; height: 75px; border-radius: 10px; object-fit: cover; background: #fff; margin-bottom: 6px; }
+.course b { font-size: 16px; font-weight: 500; color: var(--black); white-space: nowrap; }
+.course small { font-size: 10px; font-weight: 500; color: var(--gray-text); margin-top: 2px; }
+.course span { display: flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 500; margin-top: 2px; }
+
+.dim.clear { background: transparent; }
+.dropdown {
+  position: absolute; z-index: 57; padding: 2px; gap: 1px; border-radius: 15px;
+  background: #fff; box-shadow: 0 6px 16px rgba(0,0,0,0.16);
+  display: flex; flex-direction: column;
+  animation: drop 0.18s ease;
+}
+@keyframes drop { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.dropdown button { height: 31px; padding: 0 0 0 17px; text-align: left; border-radius: 20px; font-family: var(--font-p); font-size: 12px; font-weight: 600; color: #393329; }
+.dropdown button.on { background: var(--yellow-light); font-weight: 700; }
+
+/* ---------- [DE2/09 산책 중] ---------- */
+.walk-panel-top {
+  left: 20px; top: 70px; width: 353px; height: 147px; border-radius: 20px;
+  background: rgba(255,255,255,0.92); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08); z-index: 10;
+}
+.walk-panel {
+  position: absolute; left: 0; top: 650px; z-index: 20;
+  width: 393px; height: 202px; border-radius: 22px 22px 0 0; background: #fff;
+}
+.walk-stats { width: 353px; display: flex; }
+.walk-stats div { flex: 1; display: flex; flex-direction: column; gap: 14px; }
+.walk-stats small { font-size: 12px; color: #4A4A4A; }
+.walk-stats b { display: flex; align-items: center; gap: 6px; font-size: 22px; font-weight: 700; }
+.pill { flex: 1; height: 49px; border-radius: 25px; background: var(--yellow); font-size: 16px; font-weight: 600; color: #252525; }
+.pill.line { background: #fff; border: 1px solid var(--yellow); }
+/* 필터 펼침 화면: 뒤에 복제된 지도 화면의 필터 버튼은 숨김 (안 그러면 버튼이 두 겹으로 보임) */
+#walk-dropdown .filter:not(.open) { visibility: hidden; }
+
+/* ---------- [DE3 성장] 상단 탭 (Top/Tabs) ---------- */
+.grow-top { position: absolute; left: 0; top: 62px; width: 393px; height: 105px; background: #fff; }
+.grow-top .title { position: absolute; left: 0; right: 0; top: 17px; text-align: center; font-size: 24px; font-weight: 700; color: var(--brown); pointer-events: none; }
+.grow-top .graph-btn { position: absolute; left: 346px; top: 17px; }
+.grow-top .tab {
+  position: absolute; top: 62px; width: 196.5px; height: 43px;
+  font-size: 16px; font-weight: 500; color: #C7C7C7; border-bottom: 2px solid #E3E3E3;
+}
+.grow-top .tab:nth-of-type(2) { left: 0; }
+.grow-top .tab:nth-of-type(3) { left: 196.5px; }
+.grow-top .tab.on { font-weight: 700; color: #111; border-bottom-color: #111; }
+
+/* ---------- [DE3/01 기록] ---------- */
+.streak-band { width: 393px; height: 151px; background: linear-gradient(180deg, #FFD966 0%, #FFF4D6 55%, #FFFFFF 100%); }
+.streak-num { font-size: 24px; font-weight: 800; color: var(--orange); }
+.streak-num b { font-size: 55px; line-height: 46px; margin-right: 2px; }
+.bubble {
+  padding: 7px 13px; border-radius: 14px; background: #fff; font-size: 11px; font-weight: 500;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08); white-space: nowrap; z-index: 2;
+}
+.bubble::after { content: ''; position: absolute; right: 14px; bottom: -7px; border: 7px solid transparent; border-top-color: #fff; border-bottom: 0; }
+
+.cal-card { width: 353px; height: 425px; border: 1px solid #E5E5E5; border-radius: 12px; background: #fff; }
+.month-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 6px 0; color: var(--brown); }
+.month-row p { font-size: 16px; font-weight: 700; }
+.month-row button { color: #888; }
+.cal-head, .cal2 .week { display: grid; grid-template-columns: repeat(7, 46px); margin-left: 15px; }
+.cal-head { height: 62px; align-items: center; }
+.cal-head span { text-align: center; font-size: 15px; font-weight: 700; color: #333; }
+.cal2 .week { height: 43px; margin-bottom: 12px; }
+.cal2 span {
+  display: flex; align-items: center; justify-content: center; height: 43px;
+  font-size: 15px; font-weight: 700; color: #333;
+}
+.cal2 span.future { color: #BDBDBD; }
+.cal2 span.done { background: var(--yellow); color: var(--brown); border-radius: 22px; }
+.cal2 span.join-r, .cal2 span.cont-r { border-top-right-radius: 0; border-bottom-right-radius: 0; }  /* 다음날과 이어짐 */
+.cal2 span.join-l, .cal2 span.cont-l { border-top-left-radius: 0; border-bottom-left-radius: 0; }   /* 앞날과 이어짐 */
+.cal2 span.cont-r { margin-right: -15px; }   /* 토요일에서 다음 주로 이어지면 카드 끝까지 */
+.cal2 span.cont-l { margin-left: -15px; }
+.cal2 span.today { color: var(--orange); }
+.cal2 span.today::before { content: ''; position: absolute; width: 41px; height: 41px; border-radius: 50%; border: 1.5px solid var(--orange); }
+.cal2 span { position: relative; }
+.cal-legend { position: absolute; left: 0; right: 0; top: 384px; display: flex; justify-content: center; align-items: center; gap: 8px; font-size: 11px; color: #555; }
+.cal-legend .dot { width: 13px; height: 13px; border-radius: 50%; background: var(--yellow); }
+.cal-legend .ring { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid var(--orange); margin-left: 12px; }
+.day-card { width: 344px; padding: 20px 12px; border: 1px solid var(--gray-line); border-radius: 10px; background: #fff; }
+
+/* ---------- [DE3/02 기록 복구] ---------- */
+.week-card { width: 353px; height: 115px; border: 1px solid #DCDCDC; border-radius: 12px; background: #fff; }
+
+/* ---------- [DE3/05 발견] ---------- */
+.style-card {
+  width: 165px; height: 71px; padding: 10px 12px;
+  display: flex; align-items: center; gap: 10px; text-align: left;
+  border: 1px solid var(--yellow); border-radius: 10px; box-shadow: var(--shadow-card); background: #fff;
+  color: var(--yellow-deep);
+}
+.style-card svg { width: 24px; height: 24px; flex: none; }
+.style-card div { display: flex; flex-direction: column; gap: 3px; }
+.style-card small { font-size: 10px; font-weight: 500; color: #4A4A4A; }
+.style-card b { font-size: 16px; font-weight: 500; color: #000; white-space: nowrap; }
+.style-card.off { border-color: var(--gray-line); color: #CFCFCF; }
+.style-card.off small, .style-card.off b { color: #CFCFCF; }
+.next-step { border-radius: 12px; }
+.next-step .row { position: absolute; left: 17px; right: 17px; display: flex; align-items: center; justify-content: space-between; text-align: left; }
+.next-step .row span { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.next-step .row b { font-size: 14px; font-weight: 700; color: var(--black); }
+.next-step .row small { font-size: 11px; color: #5E5050; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 270px; }
+.next-step .go { width: 20px; height: 20px; border-width: 1.5px; }
+
+/* ---------- 기록 화면 들어올 때 연속 기록 슬라이딩 ----------
+   script.js가 화면 진입 시 .cal-play 를 붙임 → 달성한 날이 날짜 순서대로 왼쪽→오른쪽으로 차오름
+   --d : 칸마다 시작 지연(ms) — script.js에서 날짜 순서로 넣어 줌 */
+.cal-play .cal2 span.done { animation: band-fill 0.32s cubic-bezier(.3,.7,.3,1) both; animation-delay: var(--d, 0ms); }
+.cal-play .cal2 span.today::before { animation: today-pop 0.4s ease-out both; animation-delay: var(--d, 0ms); }
+.cal-play .streak-num, .cal-play .streak-band > p:first-child { animation: slide-in 0.5s ease-out both; }
+.cal-play .streak-num { animation-delay: 0.08s; }
+.cal-play .bubble { animation: today-pop 0.4s ease-out 1.2s both; }
+@keyframes band-fill { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes today-pop { 0% { transform: scale(0.4); opacity: 0; } 70% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); } }
+@keyframes slide-in { from { transform: translateX(-24px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .cal-play * { animation: none !important; } }
+
+/* ---------- [DE3/06 모두의 챌린지] ---------- */
+.top-icons { display: flex; gap: 14px; }
+.pill-chip { height: 31px; padding: 0 14px; border-radius: 16px; font-size: 14px; font-weight: 500; background: var(--gray-bg); color: #555; flex: none; }
+.pill-chip.on { background: var(--yellow); color: #111; font-weight: 700; }
+
+.challenge-card {
+  width: 353px; height: 89px; padding: 0 14px;
+  display: flex; align-items: center; gap: 10px; text-align: left;
+  box-shadow: none; filter: drop-shadow(0 0 2.5px rgba(0,0,0,0.15));
+}
+.challenge-card.joined { background: var(--yellow-light); }
+.challenge-card img { width: 66px; height: 66px; border-radius: 10px; object-fit: cover; flex: none; }
+.challenge-card span { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.challenge-card em { display: flex; gap: 6px; font-style: normal; align-items: center; }
+.challenge-card b { font-size: 16px; font-weight: 500; color: var(--black); white-space: nowrap; }
+.challenge-card small { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; color: var(--orange); }
+.challenge-card small.gray { color: #555; }
+.tag { height: 18px; padding: 2px 6px; border-radius: 6px; font-style: normal; font-size: 10px; font-weight: 500; background: var(--gray-bg); color: var(--gray-text); }
+.tag.yellow { background: var(--yellow); color: var(--brown); }
+.tag.plain { background: none; padding: 0; color: #555; }
+.verify { width: 74px; height: 30px; border-radius: 15px; background: var(--yellow); font-size: 12px; font-weight: 700; color: #111; flex: none; }
+
+/* ---------- [DE3/07~08 커뮤니티] ---------- */
+.board-tabs { display: flex; gap: 21px; }
+.board-tabs button { font-size: 22px; font-weight: 700; color: #C7C7C7; }
+.board-tabs button.on { color: var(--black); }
+.chip-strip { display: flex; gap: 8px; height: 31px; }
+
+.post-list { top: 218px; bottom: 0; padding-bottom: 130px; }
+.notice {
+  height: 48px; padding-left: 20px; display: flex; align-items: center; gap: 9px;
+  background: var(--yellow-light); border-bottom: 1px solid var(--gray-line);
+  font-size: 16px; font-weight: 500; letter-spacing: 0.48px;
+}
+.notice i {
+  font-style: normal; height: 27px; width: 41px; border-radius: 18px;
+  border: 1px solid var(--yellow-deep); color: var(--yellow-deep);
+  display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;
+}
+.post { position: relative; display: block; width: 393px; height: 96px; text-align: left; background: #fff; }
+.post::after { content: ''; position: absolute; left: 20px; right: 20px; bottom: 0; height: 1px; background: #EFEFEF; }
+.post b { position: absolute; left: 20px; top: 28px; font-size: 16px; font-weight: 700; letter-spacing: 0.48px; color: #000; white-space: nowrap; }
+.post small { position: absolute; left: 20px; top: 54px; font-size: 12px; font-weight: 500; color: #4A4A4A; word-spacing: 6px; }
+.post em { position: absolute; left: 267px; top: 37px; padding: 5px 7px; border-radius: 12px; background: var(--gray-line); color: #4A4A4A; font-size: 10px; font-style: normal; font-weight: 500; }
+.post img { position: absolute; left: 309px; top: 16px; width: 64px; height: 64px; border-radius: 12px; object-fit: cover; }
+
+.write-btn {
+  display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-radius: 30px; z-index: 39;
+  background: #FADB48; font-size: 16px; font-weight: 500; color: #000; box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
