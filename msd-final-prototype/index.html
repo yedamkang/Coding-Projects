@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>걸어서 캐시 속으로 — 프로토타입</title>
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+
+  <!-- 글꼴: Noto Sans KR · Pretendard · Inter · Lemon 모두 fonts/ 폴더 (style.css 맨 위 @font-face) -->
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- =========================================================
+     아이콘 모음 (SVG sprite)
+     사용법: <svg><use href="#i-back"/></svg>
+     ========================================================= -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- 상태바 -->
+    <symbol id="i-signal" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="currentColor"/><rect x="5" y="5.5" width="3" height="6.5" rx="1" fill="currentColor"/><rect x="10" y="3" width="3" height="9" rx="1" fill="currentColor"/><rect x="15" y="0" width="3" height="12" rx="1" fill="currentColor"/></symbol>
+    <symbol id="i-wifi" viewBox="0 0 17 12"><path d="M8.5 2.5c2.4 0 4.6.9 6.2 2.4l1.2-1.2A10.4 10.4 0 0 0 8.5.8 10.4 10.4 0 0 0 1.1 3.7l1.2 1.2A8.7 8.7 0 0 1 8.5 2.5Zm0 3.4c1.5 0 2.8.5 3.8 1.4l1.2-1.2a7.1 7.1 0 0 0-10 0l1.2 1.2c1-.9 2.3-1.4 3.8-1.4Zm0 3.4c.6 0 1.1.2 1.5.5L8.5 11.5 7 9.8c.4-.3.9-.5 1.5-.5Z" fill="currentColor"/></symbol>
+    <symbol id="i-battery" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="20" height="9" rx="2" fill="currentColor"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2Z" fill="currentColor" opacity=".4"/></symbol>
+
+    <!-- 공통 -->
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-talk" viewBox="0 0 24 24"><path d="M12 3.5c4.7 0 8.5 3.4 8.5 7.7s-3.8 7.7-8.5 7.7c-.9 0-1.8-.1-2.6-.4L4.5 20l1.3-4C4.4 14.7 3.5 13 3.5 11.2 3.5 6.9 7.3 3.5 12 3.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 5h18M3 10h18M3 15h18M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 26 26"><circle cx="13" cy="13" r="13" fill="currentColor"/><path d="M8 13.5l3.3 3.2L18 10" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-info" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5.4" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M6 5.3v3M6 3.5v.1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="9.5" r="2.5" fill="currentColor"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+
+    <!-- 하단 기본 내비게이터 -->
+    <symbol id="i-coin" viewBox="0 0 22 22"><circle cx="11" cy="11" r="10" fill="currentColor"/><text x="11" y="15.5" text-anchor="middle" font-family="Lemon, serif" font-size="13" fill="#fff">C</text></symbol>
+    <symbol id="i-cart" viewBox="0 0 24 24"><path d="M2 3h3l2.4 11.2a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.5L21 7H6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9.5" cy="20" r="1.5" fill="currentColor"/><circle cx="17.5" cy="20" r="1.5" fill="currentColor"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1v-9.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-growth" viewBox="0 0 24 24"><path d="M3 18l6-6 4 4 7-8M15 6h5v5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-walk" viewBox="0 0 24 24"><ellipse cx="8" cy="8" rx="3" ry="4.6" fill="none" stroke="currentColor" stroke-width="1.7"/><ellipse cx="16" cy="12.5" rx="3" ry="4.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M6.8 15.5h2.6M14.8 20h2.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+
+    <!-- 활동 내비게이터 -->
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6 9 4Zm0 0v14m6-12v14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4m0 0h11l-2 4 2 4H5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4V5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14Zm0 0 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 14.5 8 21l4-2 4 2-1-6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-people" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M2.5 20c.5-3.5 3.2-5.5 6.5-5.5s6 2 6.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M15.5 4.8a3.5 3.5 0 0 1 0 6.4M18 14.8c2 .7 3.3 2.5 3.5 5.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-home-fill" viewBox="0 0 24 24"><path d="M3.5 10.2 12 3.5l8.5 6.7V20a1 1 0 0 1-1 1h-5v-5.5h-5V21h-5a1 1 0 0 1-1-1v-9.8Z" fill="currentColor"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.8l1.6 2.4 2.8-.6.6 2.8 2.4 1.6-1.3 2.6 1.3 2.6-2.4 1.6-.6 2.8-2.8-.6L12 21.2l-1.6-2.4-2.8.6-.6-2.8-2.4-1.6L5.9 12 4.6 9.4 7 7.8l.6-2.8 2.8.6L12 2.8Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+    <symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M4 21c.6-4 3.8-6.5 8-6.5s7.4 2.5 8 6.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 10a6 6 0 0 1 12 0v4l2 3H4l2-3v-4Zm4 10h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-pin-mark" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.8-6.5-11a6.5 6.5 0 0 1 13 0c0 5.2-6.5 11-6.5 11Z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="10" r="2.3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-gift" viewBox="0 0 24 24"><rect x="3.5" y="8" width="17" height="4.5" rx="1" fill="none" stroke="#F06D5F" stroke-width="1.8"/><path d="M5 12.5V20h14v-7.5M12 8v12M12 8c-1-3-5-4-5-1.5S12 8 12 8Zm0 0c1-3 5-4 5-1.5S12 8 12 8Z" fill="none" stroke="#F06D5F" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-tree" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4.5" fill="#4CAF50"/><circle cx="8" cy="12" r="4" fill="#4CAF50"/><circle cx="16" cy="12" r="4" fill="#4CAF50"/><rect x="11" y="13" width="2.2" height="8" rx="1" fill="#8D5A3B"/></symbol>
+  </defs>
+</svg>
+
+
+<!-- =========================================================
+     폰 화면 — 아래 <section> 하나가 Figma 프레임 하나
+     id = 화면 이름 (README.md의 연결 지도와 같음)
+     ========================================================= -->
+<!-- 발표용 화면 목록 (PC 화면에서만 왼쪽에 보임, 누르면 해당 화면으로 바로 이동) -->
+<aside class="screen-index">
+  <p class="si-title">걸어서 캐시 속으로</p>
+  <p class="si-sub">화면 바로가기</p>
+  <nav class="si-list"></nav>
+</aside>
+
+<main class="phone">
+
+
+  <!-- =====================================================
+       [잠금화면 1] 기본 알림 — 프로토타입 시작 화면  (Figma 1007:6784)
+       · 알림 탭 → 잠금화면 2 (알림 확장)
+       ===================================================== -->
+  <section class="screen lock" id="lock-basic" data-theme="dark">
+    <!-- Figma 연결: 배경(시계) 탭 → 알림 확장 -->
+    <button class="abs" data-go="lock-expand" aria-label="알림 펼치기" style="left:0; top:62px; width:393px; height:150px; z-index:2;"></button>
+    <p class="lock-date">Wednesday, Nov25</p>
+    <p class="lock-time">9:41</p>
+
+    <button class="noti" style="top:250px; height:92px;" data-go="lock-expand">
+      <img src="images/cashwalk-logo.png" alt="캐시워크" class="logo" style="top:28px;">
+      <b class="app">캐시워크</b><span class="when">지금</span>
+      <b class="ttl">5일 연속 달성 중!</b>
+      <span class="body">목표까지 1,753보 남았어요!</span>
+      <span class="track" style="top:73px;"><i style="width:186px;"></i></span>
+    </button>
+
+    <div class="lock-icons">
+      <span><svg width="18" height="26" viewBox="0 0 18 26"><path d="M3 1h12v6l-3 5v13H6V12L3 7V1Z" fill="#fff"/></svg></span>
+      <span><svg width="26" height="22" viewBox="0 0 26 22"><path d="M2 5h5l2-3h8l2 3h5v16H2V5Z" fill="#fff"/><circle cx="13" cy="12.5" r="4.5" fill="#333"/></svg></span>
+    </div>
+  
+    <!-- 하단 손전등·카메라 → 앱 홈 (Figma: bottom-icons → Home) -->
+    <button class="abs" data-go="home" aria-label="앱 열기" style="left:42px; top:766px; width:54px; height:54px; border-radius:50%; z-index:3;"></button>
+    <button class="abs" data-go="home" aria-label="앱 열기" style="left:304px; top:766px; width:54px; height:54px; border-radius:50%; z-index:3;"></button>
+  </section>
+
+  <!-- =====================================================
+       [잠금화면 2] 알림 확장 — 캐시 받기 / 목표 확인하기  (Figma 1007:6805)
+       · +1 캐시 받기 → 홈 (적립 안내)
+       · 목표 확인하기 → 홈
+       ===================================================== -->
+  <section class="screen lock" id="lock-expand" data-theme="dark">
+    <!-- [데모용] 시계 부분 탭 → 다음 알림(산책 제안)으로 -->
+    <button class="abs" data-go="lock-suggest" aria-label="다음 알림 보기" style="left:0; top:62px; width:393px; height:150px; z-index:2;"></button>
+    <p class="lock-date">Wednesday, Nov25</p>
+    <p class="lock-time">9:41</p>
+
+    <div class="noti" style="top:250px; height:139px;">
+      <img src="images/cashwalk-logo.png" alt="캐시워크" class="logo" style="top:52px;">
+      <b class="app">캐시워크</b><span class="when">지금</span>
+      <b class="ttl">5일 연속 달성 중!</b>
+      <span class="body" style="font-size:13px;">1,753보 남았어요!</span>
+      <span class="track" style="top:74px;"><i style="width:186px;"></i></span>
+      <button class="act yellow" data-go="home" data-toast="+1 캐시가 적립됐어요!"><i class="coin" style="width:16px;height:16px;font-size:11px;color:#FADB48;">C</i>+1 캐시 받기</button>
+      <button class="act" data-go="home">목표 확인하기</button>
+    </div>
+
+    <div class="lock-icons">
+      <span><svg width="18" height="26" viewBox="0 0 18 26"><path d="M3 1h12v6l-3 5v13H6V12L3 7V1Z" fill="#fff"/></svg></span>
+      <span><svg width="26" height="22" viewBox="0 0 26 22"><path d="M2 5h5l2-3h8l2 3h5v16H2V5Z" fill="#fff"/><circle cx="13" cy="12.5" r="4.5" fill="#333"/></svg></span>
+    </div>
+  
+    <!-- 하단 손전등·카메라 → 앱 홈 (Figma: bottom-icons → Home) -->
+    <button class="abs" data-go="home" aria-label="앱 열기" style="left:42px; top:766px; width:54px; height:54px; border-radius:50%; z-index:3;"></button>
+    <button class="abs" data-go="home" aria-label="앱 열기" style="left:304px; top:766px; width:54px; height:54px; border-radius:50%; z-index:3;"></button>
+  </section>
+
+  <!-- =====================================================
+       [잠금화면 3] 산책 제안 알림  (Figma 1007:6834)
+       · 알림 탭 → 활동/동네산책
+       ===================================================== -->
+  <section class="screen lock" id="lock-suggest" data-theme="dark">
+    <p class="lock-date">Wednesday, Nov25</p>
+    <p class="lock-time">9:41</p>
+
+    <button class="noti" style="top:250px; height:83px;" data-go="walk-main">
+      <img src="images/cashwalk-logo.png" alt="캐시워크" class="logo" style="top:24px;">
+      <b class="app">캐시워크</b><span class="when">지금</span>
+      <b class="ttl">지금 10분, 잠깐 걸어볼까요?</b>
+      <span class="body">점심시간에 가볍게 기분전환해 봐요!</span>
+    </button>
+
+    <div class="lock-icons">
+      <span><svg width="18" height="26" viewBox="0 0 18 26"><path d="M3 1h12v6l-3 5v13H6V12L3 7V1Z" fill="#fff"/></svg></span>
+      <span><svg width="26" height="22" viewBox="0 0 26 22"><path d="M2 5h5l2-3h8l2 3h5v16H2V5Z" fill="#fff"/><circle cx="13" cy="12.5" r="4.5" fill="#333"/></svg></span>
+    </div>
+  
+    <!-- 하단 손전등·카메라 → 앱 홈 (Figma: bottom-icons → Home) -->
+    <button class="abs" data-go="home" aria-label="앱 열기" style="left:42px; top:766px; width:54px; height:54px; border-radius:50%; z-index:3;"></button>
+    <button class="abs" data-go="home" aria-label="앱 열기" style="left:304px; top:766px; width:54px; height:54px; border-radius:50%; z-index:3;"></button>
+  </section>
+
+  <!-- ╔═══════════════════════════════════════════════════════╗
+       ║  DE1 · 목표 선택형 보상                                ║
+       ╚═══════════════════════════════════════════════════════╝ -->
+
+  <!-- =====================================================
+       [DE1/01 목표설정 · 보상 선택]  (Figma 1146:18241)
+       · 보상 카드는 가로로 스크롤 (아래 노란 바가 스크롤 위치 표시)
+       · 카드 탭 → 선택 + "필요 캐시" 다시 계산
+       · 이전으로 → 뒤로 / 다음 → 걸음 수 선택
+       ===================================================== -->
+  <section class="screen" id="goal-1">
+    <div class="top">
+      <button class="back" data-back><svg width="24" height="24"><use href="#i-back"/></svg></button>
+      <p class="title">목표설정</p>
+    </div>
+    <p class="guide" style="left:25px; top:149px;">어떤 보상을<br>목표로 걸어볼까요?</p>
+    <img class="img" src="images/goal1-beaver.png" alt="" style="left:253px; top:128px; width:115px; height:82px;">
+
+    <div class="chips" style="left:20px; top:227px;">
+      <button class="chip" data-action="pickChip">전체</button>
+      <button class="chip on" data-action="pickChip">카페</button>
+      <button class="chip" data-action="pickChip">문화</button>
+      <button class="chip" data-action="pickChip">리빙</button>
+      <button class="chip" data-action="pickChip">기타</button>
+    </div>
+
+    <!-- 보상 카드 4열 × 2줄 — 가로 스크롤 -->
+    <div class="abs scroll-x" data-progress="goal1-bar" style="left:0; top:279px; width:393px; height:156px; padding:2px 20px 0;">
+      <div class="reward-grid">
+        <button class="reward-card on" data-action="pickReward" data-price="5000" data-big="images/goal3-ediya.png" data-final="images/final-reward.png"><img src="images/reward-ediya.png" alt=""><small>이디야</small><b>아메리카노</b><span><i class="coin sm">C</i>5,000</span></button>
+        <button class="reward-card" data-action="pickReward" data-price="9440"><img src="images/reward-twosome.png" alt=""><small>투썸플레이스</small><b>뉴욕 치즈 피스</b><span><i class="coin sm">C</i>9,440</span></button>
+        <button class="reward-card" data-action="pickReward" data-price="5000"><img src="images/reward-coffeebean.png" alt=""><small>커피빈</small><b>아메리카노</b><span><i class="coin sm">C</i>5,000</span></button>
+        <button class="reward-card" data-action="pickReward" data-price="7840"><img src="images/reward-hollys.png" alt=""><small>할리스</small><b>에그마요</b><span><i class="coin sm">C</i>7,840</span></button>
+        <button class="reward-card" data-action="pickReward" data-price="8000"><img src="images/reward-tlj.png" alt=""><small>뚜레쥬르</small><b>우유 식빵</b><span><i class="coin sm">C</i>8,000</span></button>
+        <button class="reward-card" data-action="pickReward" data-price="5000"><img src="images/reward-coffeebean.png" alt=""><small>커피빈</small><b>아메리카노</b><span><i class="coin sm">C</i>5,000</span></button>
+        <button class="reward-card" data-action="pickReward" data-price="6720"><img src="images/reward-ediya-cold.png" alt=""><small>이디야</small><b>콜드브루</b><span><i class="coin sm">C</i>6,720</span></button>
+        <button class="reward-card" data-action="pickReward" data-price="10400"><img src="images/reward-milktea.png" alt=""><small>투썸플레이스</small><b>밀크티 쉬폰 피스</b><span><i class="coin sm">C</i>10,400</span></button>
+      </div>
+    </div>
+    <!-- 스크롤 위치 표시 바 (Progress/Bar) -->
+    <div class="bar" style="left:20px; top:613px; width:353px;"><i id="goal1-bar" style="width:59%;"></i></div>
+
+    <!-- 필요 캐시 안내 -->
+    <div class="abs need-box" style="left:21px; top:678px;">
+      <p class="f-i" style="font-size:12px;">이 보상을 받으려면</p>
+      <p class="need-row"><i class="coin">C</i><b data-bind="need-cash">3,400</b><span>더 필요해요!</span></p>
+    </div>
+
+    <div class="btn-row" style="top:764px;">
+      <button class="prev" data-back>이전으로</button>
+      <button class="next" data-go="goal-2">다음</button>
+    </div>
+  </section>
+
+  <!-- =====================================================
+       [DE1/02 목표설정 · 걸음 수 선택]  (Figma 1146:18276)
+       · 옵션 하나 선택 (라디오), 직접설정은 −/+ 로 1,000보씩
+       · 아래 안내 카드의 날짜가 선택에 따라 바뀜
+       ===================================================== -->
+  <section class="screen" id="goal-2">
+    <div class="top">
+      <button class="back" data-back><svg width="24" height="24"><use href="#i-back"/></svg></button>
+      <p class="title">목표설정</p>
+    </div>
+    <p class="guide" style="left:21px; top:155px;">하루에 얼마나 걸을까요?</p>
+    <img class="img" src="images/guide-beaver.png" alt="" style="left:290px; top:128px; width:83px; height:82px;">
+
+    <div>
+      <button class="option on" style="top:231px;" data-action="pickSteps" data-steps="5000">
+        <i class="radio"></i><span class="txt"><b>5,000보</b><small>하루 약 40분</small></span><span class="val" data-days-for="5000">48일</span>
+      </button>
+      <button class="option" style="top:321px;" data-action="pickSteps" data-steps="8000">
+        <i class="radio"></i><span class="txt"><b>8,000보 <em class="badge-rec">추천</em></b><small>하루 약 1시간</small></span><span class="val" data-days-for="8000">30일</span>
+      </button>
+      <!-- Figma에는 "8,000보"로 적혀 있지만 24일·1시간 20분 기준이라 10,000보로 표기 -->
+      <button class="option" style="top:411px;" data-action="pickSteps" data-steps="10000">
+        <i class="radio"></i><span class="txt"><b>10,000보</b><small>하루 약 1시간 20분</small></span><span class="val" data-days-for="10000">24일</span>
+      </button>
+      <div class="option custom" style="top:501px;" data-action="pickSteps" data-steps="9000">
+        <i class="radio"></i><span class="txt"><b>직접설정</b></span>
+        <span class="stepper-mini">
+          <button data-action="stepsMinus" aria-label="1,000보 줄이기"><svg width="16" height="16"><use href="#i-minus"/></svg></button>
+          <b data-bind="custom-steps">9,000</b>
+          <button data-action="stepsPlus" aria-label="1,000보 늘리기"><svg width="16" height="16"><use href="#i-plus"/></svg></button>
+        </span>
+      </div>
+    </div>
+
+    <p class="predict" style="top:701px;"><svg><use href="#i-calendar"/></svg><span><span data-bind="date-short">1월 12일</span>에 <span data-bind="reward-name">아메리카노</span>를 받을 수 있어요</span></p>
+
+    <div class="btn-row" style="top:764px;">
+      <button class="prev" data-back>이전으로</button>
+      <button class="next" data-go="goal-3">다음</button>
+    </div>
+  </section>
+
+  <!-- =====================================================
+       [DE1/03 목표설정 · 확인]  (Figma 1146:18290)
+       · 고른 보상·걸음 수·예상 기간이 자동 반영
+       · 목표 설정하기 → 홈
+       ===================================================== -->
+  <section class="screen" id="goal-3">
+    <div class="top">
+      <button class="back" data-back><svg width="24" height="24"><use href="#i-back"/></svg></button>
+      <p class="title">목표설정</p>
+    </div>
+    <p class="guide" style="left:29px; top:155px;">이렇게 설정할까요?</p>
+
+    <div class="abs confirm-reward">
+      <img src="images/goal3-ediya.png" alt="" data-bind-src="reward-img">
+      <p style="font-size:16px;" data-bind="reward-brand">이디야</p>
+      <p style="font-size:20px; font-weight:500;" data-bind="reward-name">아메리카노</p>
+      <p class="price"><i class="coin">C</i><span data-bind="reward-price">5,000</span></p>
+    </div>
+
+    <div class="abs confirm-info">
+      <p><span>하루 걸음 수</span><b><span data-bind="steps">8,000</span> 보</b></p>
+      <p><span>예상 소요기간</span><b>약 <span data-bind="days">30</span>일</b></p>
+      <p><span>목표 달성일</span><b data-bind="date">2026년 11월 15일</b></p>
+    </div>
+
+    <div class="btn-row" style="top:764px;">
+      <button class="prev" data-back>이전으로</button>
+      <button class="next" data-go="goal-final">목표 설정하기</button>
+    </div>
+  </section>
+
+  <!-- =====================================================
+       [DE1/04 홈]  (Figma 1146:18317)
+       · 위아래로 스크롤 (아래쪽 "기록이 하루 비었어요" 카드까지)
+       · 톱니바퀴 → 설정 / 캐시 주머니 → 산책 제안 팝업
+       · 기록 카드 > → 성장/기록 / 기록 복구하러 가기 → 기록 복구
+       · [데모] 컵 탭 → 오늘 걸음 달성 상태의 홈
+       ===================================================== -->
+  <section class="screen has-scroll" id="home">
+    <div class="scroll-y">
+      <div class="content" style="height:1060px;">
+        <button class="abs" data-go="settings" aria-label="설정" style="left:345px; top:76px;"><svg width="28" height="28"><use href="#i-gear"/></svg></button>
+        <p class="guide home-guide" style="left:22px; top:117px;">지금도 한 걸음씩<br>목표에 가까워지고 있어요</p>
+
+        <!-- 목표 보상 이름 + 캐시 현황 -->
+        <div class="abs reward-status" style="left:0; top:186px; width:393px;">
+          <p class="t-12">이디야 아메리카노</p>
+          <p class="cash-row"><i class="coin">C</i><b>1,600</b><span>/ 5,000</span></p>
+        </div>
+
+        <!-- 보상 일러스트 (컵에 캐시가 차오름) -->
+        <img class="img home-cup" src="images/home-reward.png" alt="" style="left:55px; top:245px; width:260px; height:290px;">
+        <!-- Figma 연결: 보상(컵) → DE1/06 목표 달성 홈 · 비버 → DE1/07 하루 달성 홈 · 나머지 → DE1/05 팝업 -->
+        <button class="abs hs-cup" data-go="home-goaldone" aria-label="[데모] 목표 달성 상태 보기" style="left:88px; top:247px; width:219px; height:200px;"></button>
+        <button class="abs hs-beaver" data-go="home-daydone" aria-label="[데모] 하루 목표 달성 상태 보기" style="left:61px; top:430px; width:95px; height:88px;"></button>
+        <button class="abs hs-bag" data-go="home-popup" aria-label="캐시 받기" style="left:158px; top:450px; width:82px; height:84px;"></button>
+
+        <!-- 카드1: 오늘의 걸음 -->
+        <div class="card today-card" style="left:21px; top:556px; width:353px; height:126px;" data-go="grow-graph">
+          <p class="abs t-14 f-p" style="left:13px; top:20px;">오늘의 걸음</p>
+          <p class="abs" style="left:12px; top:41px;"><b class="today-steps" style="font-size:22px; font-weight:700;">6,247</b> <span class="c-dim f-p" style="font-size:18px;">/ 8,000보</span></p>
+          <p class="abs t-12 c-sub" style="left:243px; top:49px;">1.5km · 201kcal</p>
+          <div class="bar" style="left:12px; top:78px; width:329px;"><i class="today-bar" data-width="78%"></i></div>
+          <p class="abs c-sub today-cash f-i" style="left:12px; top:95px; font-size:12px;">+60C 적립됐어요!</p>
+        </div>
+
+        <!-- 카드2: 연속 기록 — 하루 비었을 때 복구 유도 -->
+        <div class="card record-card" style="left:21px; top:702px; width:353px; height:242px;">
+          <button class="abs rc-head" data-go="grow-record" style="left:18px; top:22px; width:318px;">
+            <b>기록이 하루 비었어요</b>
+            <small>10분만 산책하면 5일 연속 기록을 지킬 수 있어요</small>
+            <svg class="abs" width="20" height="20" style="right:0; top:0; color:#999;"><use href="#i-next"/></svg>
+          </button>
+          <div class="abs streak-row" style="left:25px; top:88px; width:302px;">
+            <span>일<i class="st check"></i></span>
+            <span>월<i class="st repair"></i></span>
+            <span>화<i class="st check"></i></span>
+            <span>수<i class="st check"></i></span>
+            <span>목<i class="st check"></i></span>
+            <span>금<i class="st check"></i></span>
+            <span>토<i class="st today"></i></span>
+          </div>
+          <button class="abs rc-btn" data-go="grow-recovery">기록 복구하러 가기</button>
+          <p class="abs center" style="left:21px; width:310px; top:218px; font-size:10px; color:#767676;">이번 주 1회 복구할 수 있어요</p>
+        </div>
+      </div>
+    </div>
+    <nav class="tabbar" data-on="홈"></nav>
+  </section>
+
+  <!-- =====================================================
+       [DE1/05 홈 · 산책 제안 팝업]  (Figma 1146:18370)
+       · 배경은 홈을 복제 + 어두운 막 + 바텀시트
+       · 다음 → 틈새워크 설정 / ✕·어두운 곳 → 홈
+       ===================================================== -->
+  <section class="screen" id="home-popup" data-clone="home">
+    <div class="dim" data-back></div>
+    <div class="sheet">
+      <button class="abs" data-back aria-label="닫기" style="left:350px; top:16px;"><svg width="24" height="24"><use href="#i-close"/></svg></button>
+      <img class="img" src="images/popup-beaver.png" alt="" style="left:165px; top:38px; width:63px; height:89px;">
+      <p class="abs center" style="left:0; right:0; top:141px; font-size:25px; font-weight:700; line-height:1.3; color:#111;">지금 10분,<br>잠깐 걸어볼까요?</p>
+      <p class="abs center" style="left:0; right:0; top:211px; font-size:14px; font-weight:500; color:#777; line-height:1.45;">점심시간에 잠깐 여유가 생겼네요!<br>기분전환할 산책 코스를 추천해드릴게요.</p>
+      <button class="btn" style="left:21px; top:270px; height:43px;" data-go="walk-free">다음</button>
+    </div>
+  </section>
+
+  <!-- =====================================================
+       [DE1/07 홈 · 오늘 걸음 달성]  (Figma 1146:18485)
+       · 홈을 그대로 복제해서 숫자만 8,000보 / +100C 로 바꿈 (data-patch)
+       · 오늘의 걸음 카드 → 오늘의 목표 달성 축하
+       · [데모] 컵 탭 → 컵이 가득 찬 상태
+       ===================================================== -->
+  <section class="screen has-scroll" id="home-daydone" data-clone="home" data-clone-live
+    data-patch='[{"sel":".today-steps","text":"8,000"},{"sel":".today-cash","text":"+100C 적립됐어요!"},{"sel":".today-bar","width":"100%"},{"sel":".today-card","go":"goal-today"},{"sel":".hs-cup","go":"goal-today"},{"sel":".hs-beaver","go":"goal-today"}]'>
+  </section>
+
+  <!-- =====================================================
+       [DE1/06 홈 · 보상 컵 가득]  (Figma 1146:18432)
+       · 컵 이미지만 가득 찬 버전으로 바꿈
+       · 컵 탭 → 최종 목표 달성
+       ===================================================== -->
+  <section class="screen has-scroll" id="home-goaldone" data-clone="home" data-clone-live
+    data-patch='[{"sel":".home-cup","src":"images/home-reward-full.png"},{"sel":".home-guide","html":"그동안의 걸음을 통해<br>목표에 도달했어요"},{"sel":".cash-row b","text":"5,000"},{"sel":".hs-cup","go":"goal-exchange"},{"sel":".hs-beaver","go":"goal-exchange"}]'>
+  </section>
+
+  <!-- =====================================================
+       [DE1/08 오늘의 목표 달성]  (Figma 1146:18538)
+       · 기록 보러가기 → 성장/기록 / ✕ → 홈(달성 상태)
+       ===================================================== -->
+  <section class="screen" id="goal-today">
+    <button class="close-btn" data-go="home-daydone" aria-label="닫기"><svg width="24" height="24"><use href="#i-close"/></svg></button>
+    <img class="img pop-in" src="images/today-beaver.png" alt="" style="left:66px; top:174px; width:251px; height:249px;">
+    <p class="award" style="top:441px;"><svg><use href="#i-award"/></svg>5일 연속 달성</p>
+    <div class="cheer" style="top:482px;">
+      <b>오늘의 목표를<br>달성했어요!</b>
+      <small>꾸준히 걷는 당신, 정말 멋져요</small>
+    </div>
+    <p class="predict" style="top:683px;"><svg><use href="#i-calendar"/></svg>아메리카노까지 25일 남았어요!</p>
+    <button class="btn tall" style="top:746px;" data-go="grow-record">기록 보러가기</button>
+  </section>
+
+  <!-- =====================================================
+       [DE1/09 목표 설정 완료]  (Figma 3006:7089)
+       · 목표설정 03에서 "목표 설정하기" → 이 화면
+       · 필요 걸음수·캐시·기간은 앞에서 고른 값으로 자동 계산
+       · 홈 화면으로 → 홈
+       ===================================================== -->
+  <section class="screen" id="goal-final">
+    <img class="img pop-in" src="images/final-reward.png" data-bind-src="reward-final" alt="" style="left:18px; top:178px; width:357px; height:220px; object-fit:contain;">
+    <div class="cheer final-msg" style="top:399px;">
+      <em><span data-bind="reward-brand">이디야</span> <span data-bind="reward-name">아메리카노</span></em>
+      <b>목표를 설정했어요!</b>
+      <small><span data-bind="days">30</span>일동안 꾸준히 걸어봐요!</small>
+    </div>
+    <div class="total-box" style="left:21px; top:507px;">
+      <div><small>필요 걸음수</small><b><span><span data-bind="total-steps">240,000</span>보</span></b></div>
+      <div><small>총 필요 캐시</small><b><i class="coin" style="width:18px;height:18px;font-size:12px;">C</i><span data-bind="reward-price">5,000</span></b></div>
+      <div><small>목표 기간</small><b><span><span data-bind="days">30</span>일</span></b></div>
+    </div>
+    <button class="btn tall" style="left:21px; top:746px;" data-go="home" data-toast="목표가 설정됐어요!">홈 화면으로</button>
+  </section>
+
+  <!-- =====================================================
+       [DE1/10 목표 달성 · 쿠폰 지급]  (Figma 3006:7121)
+       · 홈(목표 달성 상태)에서 컵 탭 → 이 화면
+       · 목표 설정하기 → 다음 목표 설정 / ✕ → 홈 / 쿠폰함 보기 → 안내
+       ===================================================== -->
+  <section class="screen" id="goal-exchange">
+    <button class="close-btn" data-go="home" aria-label="닫기"><svg width="24" height="24"><use href="#i-close"/></svg></button>
+    <img class="img pop-in" src="images/final-reward.png" alt="" style="left:18px; top:178px; width:357px; height:220px;">
+    <div class="cheer final-msg" style="top:399px;">
+      <em>이디야 아메리카노</em>
+      <b>목표를 달성했어요!</b>
+      <small>쿠폰함에서 언제든 다시 볼 수 있어요</small>
+    </div>
+    <div class="total-box" style="top:507px;">
+      <div><small>유효기간</small><b>2027.02.23</b></div>
+      <div><small>사용한 캐시</small><b><i class="coin" style="width:18px;height:18px;font-size:12px;">C</i>5,000</b></div>
+      <div><small>사용처</small><b>이디야</b></div>
+    </div>
+    <!-- 바코드 (Card/Barcode) — 막대는 script 없이 CSS 그라데이션으로 그림 -->
+    <div class="abs barcode-card" style="left:20px; top:611px;">
+      <i class="barcode"></i>
+      <p>1234 5678 9012</p>
+    </div>
+    <button class="btn tall" style="top:728px;" data-go="goal-next">목표 설정하기</button>
+    <button class="text-btn plain" style="top:792px;" data-toast="쿠폰함은 준비 중이에요">쿠폰함 보기</button>
+  </section>
+
+  <!-- =====================================================
+       [DE1/11 다음 목표 설정]  (Figma 3006:7197)
+       · 보상 카드 선택 → 다음 → 걸음 수 선택
+       · 더보기 → 보상 전체 목록(목표설정 01)
+       ===================================================== -->
+  <section class="screen" id="goal-next">
+    <p class="guide" style="left:32px; top:108px; font-size:24px;">다음 목표를<br>설정해볼까요?</p>
+    <img class="img" src="images/next-beaver.png" alt="" style="left:257px; top:93px; width:107px; height:76px;">
+
+    <div class="abs next-grid" style="left:42px; top:199px;">
+      <button class="reward-card on" data-action="pickReward" data-price="5000" data-big="images/goal3-ediya.png" data-final="images/final-reward.png"><img src="images/reward-ediya.png" alt=""><small>이디야</small><b>아메리카노</b><span><i class="coin sm">C</i>5,000</span></button>
+      <button class="reward-card" data-action="pickReward" data-price="6720"><img src="images/reward-ediya-cold.png" alt=""><small>이디야</small><b>콜드브루</b><span><i class="coin sm">C</i>6,720</span></button>
+      <button class="reward-card" data-action="pickReward" data-price="7840"><img src="images/reward-hollys.png" alt=""><small>할리스</small><b>에그마요</b><span><i class="coin sm">C</i>7,840</span></button>
+      <button class="reward-card" data-action="pickReward" data-price="8000"><img src="images/reward-tlj.png" alt=""><small>이디야</small><b>우유 식빵</b><span><i class="coin sm">C</i>8,000</span></button>
+      <button class="reward-card" data-action="pickReward" data-price="9440"><img src="images/reward-twosome.png" alt=""><small>투썸플레이스</small><b>뉴욕 치즈 피스</b><span><i class="coin sm">C</i>9,440</span></button>
+      <button class="reward-card" data-action="pickReward" data-price="10400"><img src="images/reward-milktea.png" alt=""><small>투썸플레이스</small><b>밀크티 쉬폰 피스</b><span><i class="coin sm">C</i>10,400</span></button>
+    </div>
+
+    <button class="btn line tall" style="top:691px;" data-go="goal-1">더보기</button>
+    <button class="btn tall" style="top:752px;" data-go="goal-2">다음</button>
+  </section>
+
+  <!-- =====================================================
+       [성장/그래프] 시간대별 걸음 수 막대그래프  (Figma 1007:7211)
+       · 시간/일별/주별/월별 세그먼트는 선택 표시만 바뀜
+       · 막대 데이터는 script.js > HOURLY_STEPS 에서 수정
+       · 뒤로가기 → 직전 화면(성장/기록)
+       ===================================================== -->
+  <section class="screen" id="grow-graph">
+    <div class="top">
+      <button class="back" data-back><svg width="24" height="24"><use href="#i-back"/></svg></button>
+      <p class="title">성장</p>
+    </div>
+
+    <!-- 세그먼트: 시간 · 일별 · 주별 · 월별 -->
+    <div class="abs segment" style="left:47px; top:135px;">
+      <button class="on" data-action="pickTab">시간</button>
+      <button data-toast="일별 그래프는 이번 프로토타입 범위 밖이에요">일별</button>
+      <button data-toast="주별 그래프는 이번 프로토타입 범위 밖이에요">주별</button>
+      <button data-toast="월별 그래프는 이번 프로토타입 범위 밖이에요">월별</button>
+    </div>
+
+    <!-- 정보 카드 -->
+    <div class="abs graph-card">
+      <p class="abs" style="left:12px; top:25px; font-size:10px; font-weight:500;">11월 25일 수 <span class="c-gray">&gt;</span></p>
+      <p class="abs" style="left:12px; top:44px;"><b class="f-p" style="font-size:26px; font-weight:600;">6,247</b> <span class="t-12 c-gray">걸음</span></p>
+      <p class="abs t-12 c-gray" style="left:12px; top:85px;">3.9 km &nbsp;·&nbsp; 168 kcal</p>
+
+      <!-- 24시간 막대그래프 (script.js가 막대를 그려 넣음) -->
+      <div class="abs chart" data-chart style="left:0; top:119px;">
+        <i class="guide" style="top:14px;"></i><i class="guide" style="top:63px;"></i>
+        <i class="guide" style="top:112px;"></i><i class="guide" style="top:161px;"></i>
+        <span class="y" style="top:8px;">1100</span><span class="y" style="top:57px;">800</span>
+        <span class="y" style="top:106px;">500</span><span class="y" style="top:155px;">200</span>
+        <span class="x" style="left:26px;">00시</span><span class="x" style="left:95px;">06시</span>
+        <span class="x" style="left:164px;">12시</span><span class="x" style="left:233px;">18시</span>
+        <span class="x" style="left:288px;">23시</span>
+      </div>
+      <p class="abs" style="left:18px; top:360px; font-size:11px; color:var(--brown);">
+        <i style="display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--yellow-deep); margin-right:7px;"></i>가장 많이 걸은 시간 13시 · 910걸음
+      </p>
+    </div>
+
+    <nav class="tabbar" data-on="성장"></nav>
+  </section>
+
+  <!-- ╔═══════════════════════════════════════════════════════╗
+       ║  DE2 · 맥락형 걷기 유도                                ║
+       ║  (잠금화면 3종은 01-lock 파트 — 디자인 변경 없음)       ║
+       ╚═══════════════════════════════════════════════════════╝ -->
+
+  <!-- =====================================================
+       [DE2/04 설정]  (Figma 1146:18745)
+       · 위아래로 스크롤 (아래 "고객 지원"까지)
+       · 목표 설정 → 목표설정 1 / 틈새워크 설정 → 틈새워크 설정
+       ===================================================== -->
+  <section class="screen has-scroll" id="settings">
+    <div class="scroll-y">
+      <div class="content" style="height:1130px;">
+        <div class="top">
+          <button class="back" data-back><svg width="24" height="24"><use href="#i-back"/></svg></button>
+        </div>
+
+        <!-- 프로필 -->
+        <button class="abs profile" style="left:0; top:122px;" data-toast="내 정보는 준비 중이에요">
+          <i class="avatar"><svg width="57" height="57" viewBox="0 0 57 57"><circle cx="28.5" cy="22" r="10" fill="#fff"/><path d="M8 57c0-11.3 9.2-19 20.5-19S49 45.7 49 57z" fill="#fff"/></svg></i>
+          <span><b>수룡이</b><small>내 정보</small></span>
+          <svg width="24" height="24" style="color:#666;"><use href="#i-next"/></svg>
+        </button>
+
+        <div class="set-group" style="top:205px;">
+          <button class="set-item" data-toast="알림 설정은 준비 중이에요">알림 설정<svg><use href="#i-next"/></svg></button>
+        </div>
+        <div class="set-group" style="top:283px;">
+          <p class="set-head">목표 및 활동</p>
+          <button class="set-item" data-go="goal-1">목표 설정<svg><use href="#i-next"/></svg></button>
+          <button class="set-item" data-go="walk-free">틈새워크 설정<svg><use href="#i-next"/></svg></button>
+        </div>
+        <div class="set-group" style="top:459px;">
+          <p class="set-head">서비스 관리</p>
+          <button class="set-item" data-toast>이중 인증<svg><use href="#i-next"/></svg></button>
+          <button class="set-item" data-toast>캐시 적립 내역<svg><use href="#i-next"/></svg></button>
+          <button class="set-item" data-toast>캐시웨어<svg><use href="#i-next"/></svg></button>
+        </div>
+        <div class="set-group" style="top:691px;">
+          <p class="set-head">고객 지원</p>
+          <button class="set-item" data-toast>자주 묻는 질문<svg><use href="#i-next"/></svg></button>
+          <button class="set-item" data-toast>불편사항 신고하기<svg><use href="#i-next"/></svg></button>
+          <button class="set-item" data-toast>이용약관동의<svg><use href="#i-next"/></svg></button>
+          <button class="set-item" data-toast>개인정보처리방침<svg><use href="#i-next"/></svg></button>
+          <button class="set-item" data-toast>위치기반 서비스 이용약관<svg><use href="#i-next"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <nav class="tabbar" data-on="홈"></nav>
+  </section>
+
+  <!-- =====================================================
+       [DE2/05 틈새워크 설정]  (Figma 1146:18777)
+       · 걷는 시간·산책 유형은 여러 개 선택 가능 (탭하면 켜고 끄기)
+       · 다음 → 동네산책
+       ===================================================== -->
+  <section class="screen" id="walk-free">
+    <div class="top">
+      <p class="title">틈새워크 설정</p>
+    </div>
+    <p class="guide" style="left:21px; top:143px;">언제 걸을 시간이<br>있나요?</p>
+    <img class="img" src="images/guide-beaver.png" alt="" style="left:290px; top:128px; width:83px; height:82px;">
+
+    <button class="option on" style="top:231px;" data-action="toggle">
+      <i class="radio"></i><span class="txt"><b>점심시간</b><small>12:00 – 13:00</small></span><span class="val">매일</span>
+    </button>
+    <button class="option" style="top:321px;" data-action="toggle">
+      <i class="radio"></i><span class="txt"><b>공강 시간</b><small>15:00 – 16:00</small></span><span class="val">화 · 목</span>
+    </button>
+    <button class="option on" style="top:411px;" data-action="toggle">
+      <i class="radio"></i><span class="txt"><b>퇴근길</b><small>18:00 – 19:00</small></span><span class="val">평일</span>
+    </button>
+
+    <p class="abs" style="left:20px; top:515px; font-size:18px; font-weight:700;">좋아하는 산책 유형</p>
+    <div class="abs type-grid" style="left:20px; top:549px;">
+      <button class="type-card on" data-action="toggle"><svg><use href="#i-leaf"/></svg><span><small>머리 식히기</small><b>기분 전환</b></span></button>
+      <button class="type-card" data-action="toggle"><svg class="keep-color"><use href="#i-tree"/></svg><span><small>공원·하천 따라</small><b>자연 감상</b></span></button>
+      <button class="type-card" data-action="toggle"><svg><use href="#i-pin-mark"/></svg><span><small>안 가본 곳</small><b>새로운 장소</b></span></button>
+      <button class="type-card on" data-action="toggle"><svg><use href="#i-gift"/></svg><span><small>제휴 매장</small><b>매장 방문</b></span></button>
+    </div>
+
+    <div class="btn-row" style="top:764px;">
+      <button class="prev" data-back>이전으로</button>
+      <button class="next" data-go="walk-main" data-toast="틈새워크 설정을 저장했어요">다음</button>
+    </div>
+  </section>
+
+  <!-- =====================================================
+       [DE2/06 동네산책]  (Figma 1146:18796)
+       · 위아래로 스크롤 (산책 장소 3번째 카드까지)
+       · 맞춤 제안 / 지도 / 장소 카드 → 산책 지도
+       ===================================================== -->
+  <section class="screen has-scroll" id="walk-main">
+    <div class="scroll-y">
+      <div class="content" style="height:920px;">
+        <p class="abs" style="left:22px; top:75px; font-size:24px; font-weight:700;">동네산책</p>
+        <button class="abs" data-toast="내 정보는 준비 중이에요" style="left:349px; top:78px;"><svg width="24" height="24"><use href="#i-person"/></svg></button>
+
+        <p class="abs" style="left:22px; top:124px; display:flex; align-items:center; gap:6px;">
+          <svg width="18" height="18"><use href="#i-pin"/></svg>
+          <span style="font-size:16px; font-weight:500;">성북구 동선동</span>
+          <span style="font-size:11px; color:#5E5050; margin-left:4px;">21° · 맑음</span>
+        </p>
+
+        <button class="abs suggest" style="left:20px; top:157px;" data-go="walk-ready">
+          <b>점심시간 10분, 새로운 장소까지</b>
+          <small>짧게 자주 걷는 스타일에 맞춘 산책이에요.</small>
+        </button>
+
+        <button class="abs" data-go="walk-ready" style="left:20px; top:224px; width:353px; height:222px; border-radius:14px; overflow:hidden;">
+          <img src="images/walk-map.png" alt="산책 경로 지도" style="width:100%; height:100%; display:block;">
+        </button>
+        <p class="abs cash-mini" style="left:304px; top:453px;"><i class="coin">C</i><b>0</b>/50</p>
+
+        <p class="abs f-p" style="left:20px; top:484px; font-size:18px; font-weight:700;">내 주변 산책 장소</p>
+        <button class="card place" style="left:20px; top:522px;" data-go="walk-ready">
+          <img src="images/place-1.png" alt=""><span><b>성북천 산책로</b><small>하천을 따라 걷기 좋은 산책길</small></span><i class="go"><svg width="16" height="16"><use href="#i-next"/></svg></i>
+        </button>
+        <button class="card place" style="left:20px; top:619px;" data-go="walk-ready">
+          <img src="images/place-2.png" alt=""><span><b>삼선공원</b><small>도심 속 여유를 즐기기 좋은 공원</small></span><i class="go"><svg width="16" height="16"><use href="#i-next"/></svg></i>
+        </button>
+        <button class="card place" style="left:20px; top:716px;" data-go="walk-ready">
+          <img src="images/course-2.png" alt=""><span><b>성북구청 바람마당</b><small>잠시 쉬어가기 좋은 열린 광장</small></span><i class="go"><svg width="16" height="16"><use href="#i-next"/></svg></i>
+        </button>
+      </div>
+    </div>
+    <nav class="activity-nav" data-on="동네산책"></nav>
+  </section>
+
+  <!-- =====================================================
+       [DE2/07 산책 지도]  (Figma 1146:18830)
+       · 기분전환 ▾ / 10분 ▾ → 필터 펼침
+       · 추천 코스 카드는 가로 스크롤 + 탭하면 선택
+       · 산책 시작하기 → 산책 중
+       ===================================================== -->
+  <section class="screen" id="walk-ready">
+    <div class="top">
+      <button class="back" data-back><svg width="24" height="24"><use href="#i-back"/></svg></button>
+      <p class="title">동네산책</p>
+    </div>
+    <button class="abs" data-toast="내 정보는 준비 중이에요" style="left:342px; top:82px;"><svg width="24" height="24"><use href="#i-person"/></svg></button>
+
+    <!-- 지도 (핀·경로·캐시 현황·새로고침 버튼까지 Figma 그림 그대로) -->
+    <img class="img" src="images/walk-ready-map.png" alt="산책 경로 지도" style="left:0; top:128px; width:393px; height:690px;">
+    <button class="abs" data-toast="지도를 새로 불러왔어요" aria-label="현 지도에서 산책하기" style="left:122px; top:138px; width:150px; height:44px;"></button>
+
+    <!-- 필터 (Button/WalkType, Button/Time) -->
+    <div class="abs filters" style="left:215px; top:466px;">
+      <button class="filter" data-go="walk-dropdown"><span data-bind="walk-purpose">기분전환</span><svg><use href="#i-down"/></svg></button>
+      <button class="filter" data-go="walk-dropdown"><span data-bind="walk-time">10분</span><svg><use href="#i-down"/></svg></button>
+    </div>
+
+    <!-- 바텀시트: 추천 산책 코스 -->
+    <div class="walk-sheet">
+      <span class="handle" style="top:13px;"></span>
+      <p class="abs" style="left:20px; top:37px; font-size:22px; font-weight:700;">추천 산책 코스</p>
+      <div class="abs scroll-x course-row" style="left:0; top:83px; width:393px; padding:2px 20px 6px 18px; scroll-padding-inline-start:18px;">
+        <button class="course on" data-action="pickChip"><img src="images/course-1.png" alt=""><b>성북천 산책로</b><small>약 9분&nbsp; 0.8km</small><span><i class="coin sm">C</i>5</span></button>
+        <button class="course" data-action="pickChip"><img src="images/course-2.png" alt=""><b>성북구청 바람마당</b><small>약 8분&nbsp; 0.4km</small><span><i class="coin sm">C</i>1</span></button>
+        <button class="course" data-action="pickChip"><img src="images/place-2.png" alt=""><b>삼선공원</b><small>약 14분&nbsp; 1.0km</small><span><i class="coin sm">C</i>5</span></button>
+      </div>
+    </div>
+    <button class="btn" style="left:21px; top:766px; height:43px; z-index:30;" data-go="walk-ing">산책 시작하기</button>
+  </section>
+
+  <!-- =====================================================
+       [DE2/08 산책 지도 · 필터 펼침]  (Figma 1146:18898)
+       · 산책 지도를 배경으로 복제 + 두 드롭다운
+       · 옵션 탭 → 필터 글자 바꾸고 지도로 / 빈 곳 탭 → 닫기
+       ===================================================== -->
+  <section class="screen" id="walk-dropdown" data-clone="walk-ready">
+    <div class="dim clear" data-back></div>
+    <div class="abs filters" style="left:215px; top:466px; z-index:57;">
+      <button class="filter open" data-back><span data-bind="walk-purpose">기분전환</span><svg><use href="#i-down"/></svg></button>
+      <button class="filter open" data-back><span data-bind="walk-time">10분</span><svg><use href="#i-down"/></svg></button>
+    </div>
+    <div class="dropdown" style="left:216px; top:506px; width:81px;">
+      <button class="on" data-action="pickOption" data-target="walk-purpose">기분전환</button>
+      <button data-action="pickOption" data-target="walk-purpose">자연감상</button>
+      <button data-action="pickOption" data-target="walk-purpose">동네탐방</button>
+      <button data-action="pickOption" data-target="walk-purpose">제휴매장</button>
+    </div>
+    <div class="dropdown" style="left:308px; top:506px; width:65px;">
+      <button class="on" data-action="pickOption" data-target="walk-time">10분</button>
+      <button data-action="pickOption" data-target="walk-time">20분</button>
+      <button data-action="pickOption" data-target="walk-time">30분</button>
+      <button data-action="pickOption" data-target="walk-time">40분+</button>
+    </div>
+  </section>
+
+  <!-- =====================================================
+       [DE2/09 산책 중]  (Figma 1146:18968)
+       · 들어오면 시간·걸음 수·거리가 1초마다 올라감
+       · 일시정지 ↔ 다시 시작 / 산책 종료 → 산책 완료
+       ===================================================== -->
+  <section class="screen" id="walk-ing">
+    <img class="img" src="images/walk-ing-map.png" alt="산책 중 지도" style="left:0; top:0; width:393px; height:852px;">
+
+    <!-- 상단 상태 패널 -->
+    <div class="abs walk-panel-top">
+      <p class="abs" style="left:20px; top:22px; font-size:18px; font-weight:700;">성북천 산책로</p>
+      <p class="abs" style="left:20px; top:48px; font-size:12px; color:#666;" data-bind="walk-state">기분 전환 산책 · 목적지까지 350m</p>
+      <p class="abs" style="left:20px; top:70px; font-size:34px; font-weight:700; color:#252525; font-variant-numeric:tabular-nums; font-family:var(--font-p);" data-bind="walk-clock">06:42</p>
+      <p class="abs" style="left:123px; top:88px; font-size:16px; color:#858585;">/ <span data-bind="walk-time">10분</span></p>
+      <div class="bar" style="left:20px; top:119px; width:313px;"><i id="walk-bar" style="width:67%;"></i></div>
+      <p class="abs cash-mini" style="left:265px; top:22px;"><i class="coin">C</i><b>0</b>/50</p>
+    </div>
+
+    <!-- 하단 기록 패널 -->
+    <div class="walk-panel">
+      <span class="handle" style="top:12px;"></span>
+      <div class="abs walk-stats" style="left:20px; top:36px;">
+        <div><small>걸음 수</small><b><span><span data-bind="walk-steps">742</span>보</span></b></div>
+        <div><small>이동 거리</small><b><span><span data-bind="walk-dist">0.54</span>km</span></b></div>
+        <div><small>적립 캐시</small><b><i class="coin" style="width:18px;height:18px;font-size:12px;">C</i>+5</b></div>
+      </div>
+      <div class="abs" style="left:20px; top:111px; width:353px; display:flex; gap:17px;">
+        <button class="pill line" data-action="togglePause">일시정지</button>
+        <button class="pill" data-go="walk-done">산책 종료</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================
+       [DE2/10 산책 완료]  (Figma 1146:19037)
+       · 기록 보러가기 → 성장/기록 / ✕ → 동네산책
+       ===================================================== -->
+  <section class="screen" id="walk-done">
+    <button class="close-btn" data-go="home" aria-label="닫기"><svg width="24" height="24"><use href="#i-close"/></svg></button>
+    <img class="img pop-in" src="images/done-beaver.png" alt="" style="left:107px; top:162px; width:180px; height:180px;">
+    <p class="award" style="top:361px;"><svg><use href="#i-award"/></svg><span data-bind="walk-purpose-label">기분 전환</span> 산책 완료</p>
+    <div class="cheer" style="top:401px;">
+      <b>오늘의 산책을<br>완료했어요!</b>
+      <small>성북천 산책로까지 잘 다녀왔어요</small>
+    </div>
+    <div class="total-box" style="top:516px;">
+      <div><small>걸음 수</small><b>1,105보</b></div>
+      <div><small>획득 캐시</small><b><i class="coin" style="width:18px;height:18px;font-size:12px;">C</i>+5</b></div>
+      <div><small>산책 시간</small><b>11:52</b></div>
+    </div>
+    <p class="predict" style="top:683px;"><svg><use href="#i-calendar"/></svg>오늘 목표까지 648보 남았어요</p>
+    <button class="btn tall" style="top:746px;" data-go="grow-record">기록 보러가기</button>
+  </section>
+
+  <!-- ╔═══════════════════════════════════════════════════════╗
+       ║  DE3 · 감정 기반 습관 유지와 목적형 커뮤니티           ║
+       ╚═══════════════════════════════════════════════════════╝ -->
+
+  <!-- =====================================================
+       [DE3/01 성장 · 기록]  (Figma 1146:19073)
+       · 위아래로 스크롤 (달력 아래 "해당일 걸음 수" 카드까지)
+       · 발견 탭 → 성장/발견 / 그래프 아이콘 → 성장/그래프
+       · 달력 날짜는 script.js > CALENDAR 에서 수정
+       ===================================================== -->
+  <section class="screen has-scroll" id="grow-record">
+    <div class="scroll-y">
+      <div class="content" style="height:1010px;">
+        <div class="grow-top">
+          <p class="title">성장</p>
+          <button class="graph-btn" data-go="grow-graph" aria-label="그래프 보기">
+            <svg width="23" height="26" viewBox="0 0 23 26"><path d="M3 24V14M9 24V8M15 24V12M21 24V4" stroke="#473A3A" stroke-width="2.6" stroke-linecap="round"/></svg>
+          </button>
+          <button class="tab on">기록</button>
+          <button class="tab" data-go="grow-discover">발견</button>
+        </div>
+
+        <!-- 연속 달성 띠 -->
+        <div class="abs streak-band" style="left:0; top:167px;">
+          <p class="abs f-i" style="left:26px; top:48px; font-size:14px; font-weight:500;">하루 8,000보 걷기</p>
+          <p class="abs streak-num f-i" style="left:20px; top:72px;"><b>5</b>일 연속 달성!</p>
+          <p class="abs bubble" style="left:166px; top:19px;">오늘도 해냈어요!</p>
+          <img class="img" src="images/record-beaver.png" alt="" style="left:238px; top:15px; width:124px; height:124px;">
+        </div>
+
+        <!-- 달력 카드 -->
+        <div class="abs cal-card" style="left:20px; top:331px;">
+          <div class="month-row">
+            <button data-toast="10월 기록은 준비 중이에요"><svg width="24" height="24"><use href="#i-back"/></svg></button>
+            <p>2026년 11월</p>
+            <button data-toast="아직 12월이 아니에요"><svg width="24" height="24"><use href="#i-next"/></svg></button>
+          </div>
+          <div class="cal-head"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
+          <div class="cal2" data-calendar></div>
+          <p class="cal-legend"><i class="dot"></i>목표달성 <i class="ring"></i>오늘</p>
+        </div>
+
+        <!-- 선택한 날의 걸음 수 (Card/StepCount) -->
+        <div class="abs day-card" style="left:24px; top:781px;">
+          <p style="font-size:14px;">11월 25일 수요일</p>
+          <p style="margin-top:9px;"><b style="font-size:23px; font-weight:700;">6,247</b> <span class="c-gray" style="font-size:18px;">/ 8,000보</span><span class="c-gray" style="float:right; font-size:12px; margin-top:7px;">1.5km · 201kcal</span></p>
+          <div class="bar" style="position:relative; margin-top:8px; width:100%;"><i data-width="78%"></i></div>
+        </div>
+      </div>
+    </div>
+    <nav class="tabbar" data-on="성장"></nav>
+  </section>
+
+  <!-- =====================================================
+       [DE3/02 기록 복구]  (Figma 1146:19211)
+       · 복구할 산책 하나 선택 → 다음 → 복구 완료
+       ===================================================== -->
+  <section class="screen" id="grow-recovery">
+    <div class="top">
+      <button class="back" data-back><svg width="24" height="24"><use href="#i-back"/></svg></button>
+      <p class="title">기록 복구</p>
+    </div>
+    <p class="guide" style="left:21px; top:143px;">어떤 산책으로<br>기록을 이을까요?</p>
+    <img class="img" src="images/guide-beaver.png" alt="" style="left:290px; top:128px; width:83px; height:82px;">
+
+    <!-- 이번 주 기록 (Card/WeekStreak) -->
+    <div class="abs week-card" style="left:20px; top:231px;">
+      <p class="abs" style="left:21px; top:17px; font-size:13px; color:#555;">화요일 기록이 비었어요</p>
+      <p class="abs" style="right:21px; top:17px; font-size:13px; color:var(--orange); font-weight:500;">4일 연속 중</p>
+      <div class="abs streak-row" style="left:21px; top:48px; width:311px;">
+        <span>일<i class="st check"></i></span><span>월<i class="st check"></i></span>
+        <span>화<i class="st repair"></i></span><span>수<i class="st today"></i></span>
+        <span>목<i class="st future"></i></span><span>금<i class="st future"></i></span><span>토<i class="st future"></i></span>
+      </div>
+    </div>
+
+    <div>
+      <button class="option on" style="top:362px;" data-action="pickOne">
+        <i class="radio"></i><span class="txt"><b>기분 전환 산책</b><small>가까운 길 · 1,000보</small></span><span class="val">10분</span>
+      </button>
+      <button class="option" style="top:452px;" data-action="pickOne">
+        <i class="radio"></i><span class="txt"><b>자연 감상 산책</b><small>성북천 · 1,500보</small></span><span class="val">15분</span>
+      </button>
+      <button class="option" style="top:542px;" data-action="pickOne">
+        <i class="radio"></i><span class="txt"><b>매장 방문 산책</b><small>제휴 매장 · 2,000보</small></span><span class="val">20분</span>
+      </button>
+    </div>
+
+    <p class="predict" style="top:701px;"><svg><use href="#i-calendar"/></svg>10분만 걸으면 5일 연속 기록을 지킬 수 있어요</p>
+    <div class="btn-row" style="top:764px;">
+      <button class="prev" data-back>이전으로</button>
+      <button class="next" data-go="grow-recovered">다음</button>
+    </div>
+  </section>
+
+  <!-- =====================================================
+       [DE3/03 기록 복구 완료]  (Figma 1146:19236)
+       · 기록 보러가기 → 성장/기록 / ✕ → 성장/기록
+       ===================================================== -->
+  <section class="screen" id="grow-recovered">
+    <button class="close-btn" data-go="grow-record" aria-label="닫기"><svg width="24" height="24"><use href="#i-close"/></svg></button>
+    <img class="img pop-in" src="images/recovered-beaver.png" alt="" style="left:87px; top:213px; width:220px; height:220px;">
+    <p class="award" style="top:451px;"><svg><use href="#i-award"/></svg>5일 연속 달성</p>
+    <div class="cheer" style="top:492px;">
+      <b>끊긴 기록을<br>다시 이었어요!</b>
+      <small>화요일 기록까지 다시 채워졌어요</small>
+    </div>
+    <p class="predict" style="top:683px;"><svg><use href="#i-calendar"/></svg>내일도 걸으면 6일 연속이에요</p>
+    <button class="btn tall" style="top:746px;" data-go="grow-record">기록 보러가기</button>
+  </section>
+
+  <!-- =====================================================
+       [DE3/05 성장 · 발견]  (Figma 1146:19316)
+       · 위아래로 스크롤 (아래 "나에게 맞는 다음 걸음" 전체)
+       · 점심시간 산책 → 동네산책 / 10분 걷기 챌린지 → 모두의 챌린지
+       ===================================================== -->
+  <section class="screen has-scroll" id="grow-discover">
+    <div class="scroll-y">
+      <div class="content" style="height:930px;">
+        <div class="grow-top">
+          <p class="title">성장</p>
+          <button class="graph-btn" data-go="grow-graph" aria-label="그래프 보기">
+            <svg width="23" height="26" viewBox="0 0 23 26"><path d="M3 24V14M9 24V8M15 24V12M21 24V4" stroke="#111" stroke-width="2.6" stroke-linecap="round"/></svg>
+          </button>
+          <button class="tab" data-go="grow-record">기록</button>
+          <button class="tab on">발견</button>
+        </div>
+
+        <img class="img pop-in" src="images/discover-beaver.png" alt="" style="left:76px; top:192px; width:241px; height:174px;">
+        <p class="abs center f-p" style="left:0; right:0; top:386px; font-size:20px; font-weight:700;">틈새 사냥꾼 비버</p>
+        <button class="abs" data-toast="공유하기는 준비 중이에요" style="left:270px; top:387px; color:#777;"><svg width="18" height="18"><use href="#i-share"/></svg></button>
+        <p class="abs center" style="left:0; right:0; top:421px; font-size:12px; font-weight:500; color:rgba(0,0,0,0.8);">바쁜 하루 속에서도 걷기 좋은 순간을 놓치지 않는 비버예요.</p>
+
+        <div class="abs style-card" style="left:25px; top:454px;">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <div><small>주로 걷는 시간</small><b>오후 1-2시</b></div>
+        </div>
+        <div class="abs style-card" style="left:205.5px; top:454px;">
+          <svg viewBox="0 0 24 24"><path d="M2 12h4l3-7 4 14 3-7h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div><small>걷기 빈도</small><b>짧게 자주</b></div>
+        </div>
+        <div class="abs style-card" style="left:25px; top:533px;">
+          <svg><use href="#i-leaf"/></svg>
+          <div><small>주 산책 유형</small><b>기분전환</b></div>
+        </div>
+        <button class="abs style-card off" style="left:205.5px; top:533px;" data-go="challenge">
+          <svg><use href="#i-award"/></svg>
+          <div><small>주 챌린지 유형</small><b>도전해보아요!</b></div>
+        </button>
+
+        <p class="abs f-p" style="left:25px; top:641px; display:flex; align-items:center; gap:6px; font-size:16px; font-weight:700;"><svg width="20" height="20"><use href="#i-walk"/></svg>나에게 맞는 다음 걸음</p>
+        <div class="card next-step" style="left:25px; top:669px; width:344px; height:137px;">
+          <button class="row" style="top:17px;" data-go="walk-main">
+            <span><b>점심시간, 10분 기분 전환 산책</b><small>오늘은 성북천을 따라 잠깐 걸어볼까요?</small></span>
+            <i class="go"><svg width="14" height="14"><use href="#i-next"/></svg></i>
+          </button>
+          <i class="abs" style="left:13px; right:13px; top:69px; height:1px; background:#E5E5E5;"></i>
+          <button class="row" style="top:85px;" data-go="challenge">
+            <span><b>하루 10분 걷기 챌린지</b><small>부담 없이 하루 10분씩 걸으며 새로운 습관을 만들어 보세요!</small></span>
+            <i class="go"><svg width="14" height="14"><use href="#i-next"/></svg></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <nav class="tabbar" data-on="성장"></nav>
+  </section>
+
+  <!-- =====================================================
+       [DE3/06 모두의 챌린지]  (Figma 1146:19348)
+       · 카테고리 칩 선택 / 배너 → 안내
+       · 참여 중인 챌린지 "인증하기" → 커뮤니티 · 챌린지 게시판
+       ===================================================== -->
+  <section class="screen" id="challenge">
+    <p class="abs" style="left:22px; top:75px; font-size:24px; font-weight:700;">모두의 챌린지</p>
+    <div class="abs top-icons" style="left:311px; top:78px;">
+      <button data-toast="검색은 준비 중이에요"><svg width="24" height="24"><use href="#i-search"/></svg></button>
+      <button data-toast="내 정보는 준비 중이에요"><svg width="24" height="24"><use href="#i-person"/></svg></button>
+    </div>
+    <div class="chips" style="left:20px; top:125px;">
+      <button class="chip pill-chip on" data-action="pickChip">추천</button>
+      <button class="chip pill-chip" data-action="pickChip">걷기</button>
+      <button class="chip pill-chip" data-action="pickChip">습관</button>
+      <button class="chip pill-chip" data-action="pickChip">기상</button>
+      <button class="chip pill-chip" data-action="pickChip">운동</button>
+    </div>
+
+    <!-- 광고 배너 (Banner/Ad) -->
+    <button class="abs" style="left:0; top:172px; width:393px; height:131px;" data-toast="채널 추가는 준비 중이에요">
+      <img src="images/challenge-banner.png" alt="모두의 챌린지 채널 추가하고 다양한 소식 받아보세요" style="width:100%; height:100%; display:block;">
+    </button>
+
+    <p class="abs f-p" style="left:20px; top:327px; font-size:18px; font-weight:700;">참여 중인 챌린지</p>
+    <div class="card challenge-card joined" style="left:20px; top:360px;" data-go="challenge-board">
+      <img src="images/ch-joined.png" alt="">
+      <span>
+        <em><i class="tag yellow">걷기</i><i class="tag plain">1일째</i></em>
+        <b>쭉-걷기, 10시 전 인증</b>
+        <small class="gray"><svg width="12" height="12"><use href="#i-people"/></svg>13/15</small>
+      </span>
+      <button class="verify" data-go="challenge-board">인증하기</button>
+    </div>
+
+    <p class="abs f-p" style="left:20px; top:477px; font-size:18px; font-weight:700;">모챌 픽! 추천 챌린지</p>
+    <button class="card challenge-card" style="left:20px; top:510px;" data-toast="챌린지 참여는 준비 중이에요">
+      <img src="images/ch-rec-1.png" alt="">
+      <span>
+        <em><i class="tag yellow">걷기</i><i class="tag plain">3시간 전 대화</i></em>
+        <b>웃으며 걷기</b>
+        <small><svg width="12" height="12"><use href="#i-people"/></svg>선착순 2명 남음</small>
+      </span>
+    </button>
+    <button class="card challenge-card" style="left:20px; top:611px;" data-toast="챌린지 참여는 준비 중이에요">
+      <img src="images/ch-rec-2.png" alt="">
+      <span>
+        <em><i class="tag yellow">걷기</i><i class="tag plain">1시간 전 대화</i></em>
+        <b>부담없이 같이 걷기</b>
+        <small><svg width="12" height="12"><use href="#i-people"/></svg>선착순 3명 남음</small>
+      </span>
+    </button>
+
+    <nav class="activity-nav" data-on="모두의챌린지"></nav>
+  </section>
+
+  <!-- =====================================================
+       [DE3/07 커뮤니티 · 동네생활]  (Figma 1146:19370)
+       · 게시판 탭 "챌린지" → 챌린지 게시판
+       · 카테고리 칩은 가로 스크롤, 게시글 목록은 세로 스크롤
+       ===================================================== -->
+  <section class="screen" id="community">
+    <p class="abs" style="left:22px; top:75px; font-size:24px; font-weight:700;">커뮤니티</p>
+    <div class="abs top-icons" style="left:273px; top:78px;">
+      <button data-toast="검색은 준비 중이에요"><svg width="24" height="24"><use href="#i-search"/></svg></button>
+      <button data-toast="새 알림이 없어요"><svg width="24" height="24"><use href="#i-bell"/></svg></button>
+      <button data-toast="내 정보는 준비 중이에요"><svg width="24" height="24"><use href="#i-person"/></svg></button>
+    </div>
+    <div class="abs board-tabs" style="left:20px; top:126px;">
+      <button class="on">동네생활</button>
+      <button data-go="challenge-board">챌린지</button>
+    </div>
+    <div class="abs scroll-x chip-strip" style="left:0; top:171px; width:393px; padding:0 20px;">
+      <button class="chip pill-chip on" data-action="pickChip">전체</button>
+      <button class="chip pill-chip" data-action="pickChip">인기</button>
+      <button class="chip pill-chip" data-action="pickChip">건강</button>
+      <button class="chip pill-chip" data-action="pickChip">소식·정보</button>
+      <button class="chip pill-chip" data-action="pickChip">취미</button>
+      <button class="chip pill-chip" data-action="pickChip">고민</button>
+    </div>
+
+    <div class="post-list scroll-y">
+      <div class="notice"><i>공지</i>커뮤니티 활동 규정을 확인해 주세요</div>
+        <button class="post" data-toast="게시글 보기는 준비 중이에요"><b>성북천에 오리들이 다시 보이네요!</b><small>동선동 · 1일 전 · 조회 216</small><em>18</em><img src="images/post-1.png" alt=""></button>
+        <button class="post" data-toast="게시글 보기는 준비 중이에요"><b>점심시간에 걷기 좋은 길 추천해요</b><small>동선동 · 2일 전 · 조회 184</small><em>12</em><img src="images/post-2.png" alt=""></button>
+        <button class="post" data-toast="게시글 보기는 준비 중이에요"><b>성북구청 앞 작은 장터 구경했어요</b><small>삼선동 · 3일 전 · 조회 129</small><em>8</em><img src="images/post-3.png" alt=""></button>
+        <button class="post" data-toast="게시글 보기는 준비 중이에요"><b>오늘 삼선공원 단풍이 예쁘네요</b><small>삼선동 · 4일 전 · 조회 302</small><em>21</em><img src="images/post-4.png" alt=""></button>
+        <button class="post" data-toast="게시글 보기는 준비 중이에요"><b>성신여대 근처 조용한 카페 추천</b><small>동선동 · 5일 전 · 조회 257</small><em>15</em><img src="images/post-2.png" alt=""></button>
+        <button class="post" data-toast="게시글 보기는 준비 중이에요"><b>함께 저녁 산책하실 분 계신가요?</b><small>돈암동 · 6일 전 · 조회 143</small><em>9</em><img src="images/post-3.png" alt=""></button>
+        <button class="post" data-toast="게시글 보기는 준비 중이에요"><b>우리 동네 숨은 골목길 발견!</b><small>보문동 · 7일 전 · 조회 198</small><em>14</em><img src="images/post-1.png" alt=""></button>
+        <button class="post" data-toast="게시글 보기는 준비 중이에요"><b>퇴근길에 본 예쁜 노을 공유해요</b><small>동선동 · 8일 전 · 조회 231</small><em>17</em><img src="images/post-4.png" alt=""></button>
+    </div>
+
+    <button class="abs write-btn" style="left:266px; top:660px;" data-toast="글쓰기는 준비 중이에요"><svg width="24" height="24"><use href="#i-plus"/></svg>글쓰기</button>
+    <nav class="activity-nav" data-on="커뮤니티" style="left:19px;"></nav>
+  </section>
+
+  <!-- =====================================================
+       [DE3/08 커뮤니티 · 챌린지 게시판]  (Figma 1146:19394)
+       · 게시판 탭 "동네생활" → 동네생활
+       · 참여 중인 챌린지 칩 선택 / 인증하기 → 안내
+       ===================================================== -->
+  <section class="screen" id="challenge-board">
+    <p class="abs" style="left:22px; top:75px; font-size:24px; font-weight:700;">커뮤니티</p>
+    <div class="abs top-icons" style="left:273px; top:78px;">
+      <button data-toast="검색은 준비 중이에요"><svg width="24" height="24"><use href="#i-search"/></svg></button>
+      <button data-toast="새 알림이 없어요"><svg width="24" height="24"><use href="#i-bell"/></svg></button>
+      <button data-toast="내 정보는 준비 중이에요"><svg width="24" height="24"><use href="#i-person"/></svg></button>
+    </div>
+    <div class="abs board-tabs" style="left:20px; top:126px;">
+      <button data-go="community">동네생활</button>
+      <button class="on">챌린지</button>
+    </div>
+    <div class="abs scroll-x chip-strip" style="left:0; top:171px; width:393px; padding:0 20px;">
+      <button class="chip pill-chip on" data-action="pickChip">쭉-걷기, 10시 전 인증</button>
+      <button class="chip pill-chip" data-action="pickChip">점심 산책 30분</button>
+      <button class="chip pill-chip" data-action="pickChip">주말 공원 걷기</button>
+    </div>
+
+    <div class="post-list scroll-y">
+      <div class="notice"><i>공지</i>챌린지 인증 규칙을 확인해 주세요</div>
+        <button class="post" data-toast="인증글 보기는 준비 중이에요"><b>성북천까지 걷고 인증해요</b><small>12일차 · 10분 전 · 응원 24</small><em>6</em><img src="images/post-1.png" alt=""></button>
+        <button class="post" data-toast="인증글 보기는 준비 중이에요"><b>출근 전에 한 바퀴 돌았어요</b><small>5일차 · 32분 전 · 응원 18</small><em>3</em><img src="images/post-2.png" alt=""></button>
+        <button class="post" data-toast="인증글 보기는 준비 중이에요"><b>비 와서 지하상가로 걸었어요</b><small>21일차 · 1시간 전 · 응원 41</small><em>12</em><img src="images/post-3.png" alt=""></button>
+        <button class="post" data-toast="인증글 보기는 준비 중이에요"><b>처음으로 10시 전 인증 성공</b><small>1일차 · 2시간 전 · 응원 57</small><em>15</em><img src="images/post-4.png" alt=""></button>
+        <button class="post" data-toast="인증글 보기는 준비 중이에요"><b>일주일 연속 달성 인증샷</b><small>7일차 · 3시간 전 · 응원 33</small><em>9</em><img src="images/post-2.png" alt=""></button>
+        <button class="post" data-toast="인증글 보기는 준비 중이에요"><b>오늘은 공원 두 바퀴</b><small>30일차 · 4시간 전 · 응원 62</small><em>21</em><img src="images/post-3.png" alt=""></button>
+        <button class="post" data-toast="인증글 보기는 준비 중이에요"><b>아침 햇살 받으며 인증</b><small>9일차 · 5시간 전 · 응원 15</small><em>2</em><img src="images/post-1.png" alt=""></button>
+        <button class="post" data-toast="인증글 보기는 준비 중이에요"><b>비버랑 같이 걸었어요</b><small>3일차 · 6시간 전 · 응원 27</small><em>4</em><img src="images/post-4.png" alt=""></button>
+    </div>
+
+    <button class="abs write-btn" style="left:252px; top:660px;" data-toast="인증 올리기는 준비 중이에요"><svg width="24" height="24"><use href="#i-plus"/></svg>인증하기</button>
+    <nav class="activity-nav" data-on="커뮤니티" style="left:19px;"></nav>
+  </section>
+
+  <!-- 프로토타입 범위 밖 기능을 눌렀을 때 뜨는 안내 -->
+  <div class="toast"></div>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
